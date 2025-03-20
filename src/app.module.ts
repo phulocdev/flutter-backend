@@ -5,7 +5,6 @@ import { CoreModule } from './core/core.module'
 import { AccountsModule } from './domains/accounts/accounts.module'
 import { AuthModule } from 'domains/auth/auth.module'
 import { MediaModule } from './domains/media/media.module'
-import { DishesModule } from './domains/dishes/dishes.module'
 import { ProductsModule } from './domains/products/products.module'
 import { CartsModule } from './domains/carts/carts.module'
 import { CategoriesModule } from './domains/categories/categories.module'
@@ -17,7 +16,6 @@ import { OrdersModule } from 'domains/orders/orders.module'
     AuthModule,
     AccountsModule,
     MediaModule,
-    DishesModule,
     OrdersModule,
     ProductsModule,
     CartsModule,

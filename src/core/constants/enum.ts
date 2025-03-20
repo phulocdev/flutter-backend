@@ -3,9 +3,8 @@ export enum Role {
   Admin = 'Admin'
 }
 
-export enum DishStatus {
-  Available = 'Available',
-  Unavailable = 'Unavailable',
+export enum ProductActive {
+  Show = 'Show',
   Hidden = 'Hidden'
 }
 

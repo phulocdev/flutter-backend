@@ -68,6 +68,7 @@ export class AccountsService {
     if (!account) {
       throw new NotFoundError('Tài khoản không tồn tại')
     }
+
     return this.accountModel.findById(id)
   }
 
@@ -117,7 +118,6 @@ export class AccountsService {
     return this.accountModel.deleteOne({ _id: id })
   }
 
-  // ------------------------- Utils Functions ----------------------------------
   hashPassword(password: string) {
     return bcrypt.hash(password, this.saltRounds)
   }

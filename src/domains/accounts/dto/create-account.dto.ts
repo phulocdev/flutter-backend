@@ -31,7 +31,7 @@ export class CreateAccountDto {
   @IsString({ message: 'imageUrl phải là kiểu dữ liệu là string' })
   @IsOptional() // Tác dụng khi gọi API
   @Transform(({ value }) => String(value).trim())
-  avatarUrl?: string // ? Tác dụng cho TS check
+  avatarUrl?: string // ? Tác dụng cho Developer nhìn chứ TS không có check
 
   @IsEnum(Role, {
     message: `role phải là một trong những giá trị sau: ${Role.Customer} || ${Role.Admin}`
