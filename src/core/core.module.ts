@@ -1,14 +1,17 @@
 import { Module, ValidationPipe } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
-import { APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core'
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core'
 import { MongooseModule } from '@nestjs/mongoose'
 import { ValidationError } from 'class-validator'
 import { client, database, environment, port, server, token, upload } from 'config'
+import AnyExceptionFilter from 'core/exceptions/any-exception-filter'
 import { UnprocessableEntityError } from 'core/exceptions/errors.exception'
 import { JwtAuthGuard } from 'core/guards/jwt-auth.guard'
 import { TransformResponseInterceptor } from 'core/interceptors/transform-response.interceptor'
 import { extractErrorMessageFromDto } from 'core/utils/utils'
 import Joi from 'joi'
+import mongoose from 'mongoose'
+import { softDeletePlugin } from 'soft-delete-plugin-mongoose'
 
 @Module({
   imports: [
@@ -28,9 +31,11 @@ import Joi from 'joi'
       })
     }),
     MongooseModule.forRootAsync({
-      useFactory: async (configService: ConfigService) => ({
-        uri: configService.get<string>('databaseUri')
-      }),
+      useFactory: async (configService: ConfigService) => {
+        return {
+          uri: configService.get<string>('databaseUri')
+        }
+      },
       inject: [ConfigService]
     })
   ],
@@ -64,7 +69,8 @@ import Joi from 'joi'
           )
         }
       })
-    }
+    },
+    { provide: APP_FILTER, useClass: AnyExceptionFilter }
   ],
   exports: []
 })

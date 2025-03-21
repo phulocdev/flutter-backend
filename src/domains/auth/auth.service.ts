@@ -48,17 +48,17 @@ export class AuthService {
   async register(registerAccountDto: RegisterAccountDto) {
     const { email, fullName, password, address } = registerAccountDto
 
-    const accountId = new mongoose.Types.ObjectId()
+    const accountId = new mongoose.Types.ObjectId().toString()
     const [accessToken, refreshToken] = await Promise.all([
       this.signAccessToken({
-        _id: accountId.toString(),
+        _id: accountId,
         email,
         fullName,
         role: Role.Customer,
         avatarUrl: ''
       }),
       this.signRefreshToken({
-        _id: accountId.toString(),
+        _id: accountId,
         email,
         fullName,
         role: Role.Customer,
@@ -71,9 +71,9 @@ export class AuthService {
       password,
       fullName,
       address,
-      _id: accountId.toString()
+      _id: accountId
     })
-    this.accountsService.updateRefreshToken(accountId.toString(), refreshToken)
+    this.accountsService.updateRefreshToken(accountId, refreshToken)
 
     return {
       accessToken,

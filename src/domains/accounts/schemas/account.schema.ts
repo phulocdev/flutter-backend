@@ -5,9 +5,11 @@ import * as mongoose from 'mongoose'
 export type AccountDocument = mongoose.HydratedDocument<Account>
 
 // Việc định nghĩa type cho các field có mục đích cho việc findAll() và findOne() mà thôi
-// -> Giúp gọi đúng các method, fields của các kiểu dữ liệu ấy
+// -> Giúp gọi đúng các method của fields ứng với kiểu dữ liệu ấy
 // Định nghĩa type không giúp TS trong việc check dữ liệu của các trường tương ứng khi create() update()
 // cho dù định nghĩa là string cho field a, nhưng mà lúc create() có thể thêm cho field a một Object thì TS cũng không báo lỗi
+// Không báo lỗi lúc code thôi chứ lúc thêm vô là nó sẽ auto cast sang type mà đã định nghĩa. Cast không đc -> báo lỗi ngay
+
 // -> khi create() update() thì nên phụ thuộc vào DTO, còn các biến thể tùy chọn khác phải do DEV tự xem xét
 
 // Định nghĩa Type trong  @Prop({ type: String }) có tác dụng cast LẦN 1 trước khi để mongoose thêm vào collection
@@ -17,8 +19,8 @@ export type AccountDocument = mongoose.HydratedDocument<Account>
 // Lưu ý: nếu là number thì nó có thể auto cast trang string nha
 @Schema({ timestamps: true, versionKey: false, collection: 'Accounts' })
 export class Account {
-  @Prop({ required: true, type: mongoose.Schema.Types.ObjectId })
-  _id: mongoose.Schema.Types.ObjectId
+  // @Prop({ required: true, type: mongoose.Schema.Types.ObjectId })
+  // _id: mongoose.Schema.Types.ObjectId
 
   @Prop({ required: true, index: true, unique: true, type: String })
   email: string

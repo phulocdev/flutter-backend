@@ -1,5 +1,6 @@
 import { ValidationError } from 'class-validator'
 import { customAlphabet } from 'nanoid'
+import crypto from 'crypto'
 
 export const extractErrorMessageFromDto = (errors: ValidationError[]): string[] => {
   const messages: string[] = []
@@ -35,4 +36,18 @@ export const generateOrderCode = () => {
 export const generateCustomerCode = () => {
   const nanoid = customAlphabet('0123456789', 6)()
   return `CUS${nanoid}`
+}
+
+export const generateSkuCode = ({
+  brand,
+  attributeValues,
+  productId
+}: {
+  brand: string
+  attributeValues: string[]
+  productId: string
+}) => {
+  const uniqueString = `${attributeValues.join('-')}-${productId}`
+  const hash = crypto.createHash('md5').update(uniqueString).digest('hex').slice(0, 8)
+  return `${brand.toUpperCase()}-${hash}`
 }

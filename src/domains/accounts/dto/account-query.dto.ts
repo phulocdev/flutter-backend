@@ -1,6 +1,5 @@
 import { Type } from 'class-transformer'
-import { IsEnum, IsOptional, IsString, Min, MinLength } from 'class-validator'
-import { OrderStatus } from 'core/constants/enum'
+import { IsOptional, IsString, MinLength } from 'class-validator'
 
 export class AccountQueryDto {
   @MinLength(5, { message: 'sort phải có ít nhất 5 ký tự' })
@@ -20,10 +19,4 @@ export class AccountQueryDto {
   @Type(() => String)
   @IsOptional()
   customerCode?: string | undefined
-
-  @IsEnum(OrderStatus, {
-    message: `status phải là một trong những giá trị sau: ${Object.values(OrderStatus).join(' || ')}`
-  })
-  @IsOptional()
-  status?: OrderStatus | undefined
 }

@@ -5,17 +5,13 @@ import * as mongoose from 'mongoose'
 
 export type ProductAttributeSkuDocument = mongoose.HydratedDocument<ProductAttributeSku>
 
-@Schema({ timestamps: true, versionKey: false, collection: 'ProductAttributeSku' })
+@Schema({ timestamps: true, versionKey: false, collection: 'ProductAttributeSku', id: false })
 export class ProductAttributeSku {
   @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: 'ProductAttribute' })
-  productAttribute: ProductAttribute | null
-  // productAttribute: ProductAttribute
-  // productAttribute?: ProductAttribute
+  productAttribute: ProductAttribute
 
   @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: 'Sku' })
-  sku: Sku | null
-  // sku: Sku
-  // sku?: Sku
+  sku: Sku
 
   // Attribute Value
   @Prop({ required: true, type: String })

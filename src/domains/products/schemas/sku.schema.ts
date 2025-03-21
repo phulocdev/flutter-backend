@@ -15,7 +15,7 @@ export class Sku {
   sku: string
 
   @Prop({ required: true, type: Number })
-  basePrice: number
+  price: number
 
   @Prop({ required: true, type: Number })
   stockQuantity: number

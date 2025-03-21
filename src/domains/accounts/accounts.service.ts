@@ -24,7 +24,7 @@ export class AccountsService {
     const newAccount = await this.accountModel.create({
       ...createAccountDto,
       password: hashedPassword,
-      _id: createAccountDto._id ?? new mongoose.Types.ObjectId()
+      _id: createAccountDto._id
     })
 
     return {
