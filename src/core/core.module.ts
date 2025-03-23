@@ -10,8 +10,6 @@ import { JwtAuthGuard } from 'core/guards/jwt-auth.guard'
 import { TransformResponseInterceptor } from 'core/interceptors/transform-response.interceptor'
 import { extractErrorMessageFromDto } from 'core/utils/utils'
 import Joi from 'joi'
-import mongoose from 'mongoose'
-import { softDeletePlugin } from 'soft-delete-plugin-mongoose'
 
 @Module({
   imports: [
@@ -26,8 +24,10 @@ import { softDeletePlugin } from 'soft-delete-plugin-mongoose'
         ACCESS_TOKEN_EXPIRATION_TIME: Joi.string().required(),
         REFRESH_TOKEN_SECRET: Joi.string().required(),
         REFRESH_TOKEN_EXPIRATION_TIME: Joi.string().required(),
-        MULTER_DEFAULT_DEST: Joi.string().required(),
-        SERVER_BASE_URL: Joi.string().required()
+        SERVER_BASE_URL: Joi.string().required(),
+        CLOUDINARY_API_KEY: Joi.string().required(),
+        CLOUDINARY_API_SECRET: Joi.string().required(),
+        CLOUDINARY_CLOUD_NAME: Joi.string().required()
       })
     }),
     MongooseModule.forRootAsync({
