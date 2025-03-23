@@ -29,6 +29,7 @@ export class MediaController {
     FilesInterceptor('files', MAX_COUNT_UPLOAD_MULTIPLE_FILE, createMulterOptions(LIMIT_UPLOAD_MULTIPLE_FILE))
   )
   async uploadMultipleFiles(@UploadedFiles() files: Array<Express.Multer.File>, @Request() req: RequestType) {
+    console.log('herer')
     const urls = await this.cloudinaryService.uploadFiles(files, req)
     return {
       result: urls
