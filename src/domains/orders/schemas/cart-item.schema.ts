@@ -3,7 +3,7 @@ import * as mongoose from 'mongoose'
 
 @Schema({ versionKey: false })
 export class CartItem {
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'sku' })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Sku' })
   sku: mongoose.Types.ObjectId
 
   @Prop({ required: true, type: Number })

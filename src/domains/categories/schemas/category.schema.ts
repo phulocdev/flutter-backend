@@ -4,7 +4,7 @@ import { softDeletePlugin } from 'soft-delete-plugin-mongoose'
 
 export type CategoryDocument = mongoose.HydratedDocument<Category>
 
-@Schema({ timestamps: true, versionKey: false, collection: 'Categories' })
+@Schema({ versionKey: false, collection: 'Categories' })
 export class Category {
   @Prop({ required: true, type: String })
   name: string

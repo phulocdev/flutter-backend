@@ -9,6 +9,7 @@ import { FilterQuery, Model } from 'mongoose'
 import { CreateCategoryDto } from './dto/create-category.dto'
 import { UpdateCategoryDto } from './dto/update-category.dto'
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose'
+import moment from 'moment-timezone'
 
 @Injectable()
 export class CategoriesService {
@@ -18,7 +19,9 @@ export class CategoriesService {
   ) {}
 
   async create(createCategoryDto: CreateCategoryDto) {
-    return this.categoryModel.create(createCategoryDto)
+    return this.categoryModel.create({
+      ...createCategoryDto
+    })
   }
 
   async findAll(qs: PaginationQueryDto & DateRangeQueryDto & CategoryQueryDto) {
