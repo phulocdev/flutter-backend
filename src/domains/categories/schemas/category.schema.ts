@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import * as mongoose from 'mongoose'
-import { softDeletePlugin } from 'soft-delete-plugin-mongoose'
 
 export type CategoryDocument = mongoose.HydratedDocument<Category>
 
@@ -16,6 +15,6 @@ export class Category {
   imageUrl: string
 }
 
-export const CategorySchema = SchemaFactory.createForClass(Category).plugin(softDeletePlugin)
+export const CategorySchema = SchemaFactory.createForClass(Category)
 
 CategorySchema.index({ name: 1, parentCategory: 1 }, { unique: true })

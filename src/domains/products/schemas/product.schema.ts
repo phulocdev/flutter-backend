@@ -2,7 +2,6 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { ProductStatus } from 'core/constants/enum'
 import { Category } from 'domains/categories/schemas/category.schema'
 import * as mongoose from 'mongoose'
-import { softDeletePlugin } from 'soft-delete-plugin-mongoose'
 
 export type ProductDocument = mongoose.HydratedDocument<Product>
 
@@ -31,4 +30,4 @@ export class Product {
   basePrice: number
 }
 
-export const ProductSchema = SchemaFactory.createForClass(Product).plugin(softDeletePlugin)
+export const ProductSchema = SchemaFactory.createForClass(Product)

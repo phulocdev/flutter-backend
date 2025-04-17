@@ -8,15 +8,11 @@ import { Category, CategoryDocument } from 'domains/categories/schemas/category.
 import { FilterQuery, Model } from 'mongoose'
 import { CreateCategoryDto } from './dto/create-category.dto'
 import { UpdateCategoryDto } from './dto/update-category.dto'
-import { SoftDeleteModel } from 'soft-delete-plugin-mongoose'
 import moment from 'moment-timezone'
 
 @Injectable()
 export class CategoriesService {
-  constructor(
-    @InjectModel(Category.name) private categoryModel: Model<Category>,
-    @InjectModel(Category.name) private categorySoftDeleteModel: SoftDeleteModel<CategoryDocument>
-  ) {}
+  constructor(@InjectModel(Category.name) private categoryModel: Model<Category>) {}
 
   async create(createCategoryDto: CreateCategoryDto) {
     return this.categoryModel.create({
@@ -145,6 +141,6 @@ export class CategoriesService {
   async remove(id: string) {
     const a = await this.findOne(id)
     const filter = { _id: id }
-    return this.categorySoftDeleteModel.softDelete(filter)
+    return this.categoryModel.deleteOne(filter)
   }
 }

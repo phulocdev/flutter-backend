@@ -5,7 +5,6 @@ import { ProductAttribute } from 'domains/products/schemas/product-attributes.sc
 import { Product, ProductDocument } from 'domains/products/schemas/product.schema'
 import { Sku } from 'domains/products/schemas/sku.schema'
 import mongoose, { FilterQuery, Model, Types } from 'mongoose'
-import { SoftDeleteModel } from 'soft-delete-plugin-mongoose'
 import { CreateProductDto } from './dto/create-product.dto'
 import { UpdateProductDto } from './dto/update-product.dto'
 import { generateSkuCode } from 'core/utils/utils'
@@ -17,7 +16,6 @@ import { ProductQueryDto } from 'domains/products/dto/product-query-dto'
 export class ProductsService {
   constructor(
     @InjectModel(Product.name) private productModel: Model<Product>,
-    @InjectModel(Product.name) private productSoftDeleteModel: SoftDeleteModel<ProductDocument>,
     @InjectModel(ProductAttribute.name) private productAttributeModel: Model<ProductAttribute>,
     @InjectModel(Sku.name) private skuModel: Model<Sku>,
     @InjectModel(ProductAttributeSku.name)
