@@ -8,6 +8,7 @@ import { PaginationQueryDto } from 'core/query-string-dtos/pagination-query.dto'
 import { ValidateDateRange } from 'core/pipes/validate-date-range.pipe'
 import { DateRangeQueryDto } from 'core/query-string-dtos/date-range-query.dto'
 import { ProductQueryDto } from 'domains/products/dto/product-query-dto'
+import { Public } from 'core/decorators/public.decorator'
 
 @Controller('products')
 export class ProductsController {
@@ -18,6 +19,7 @@ export class ProductsController {
     return this.productsService.create(createProductDto)
   }
 
+  @Public()
   @Get()
   @ResponseMessage('Fetch danh sách sản phẩm thành công')
   findAll(
@@ -29,6 +31,7 @@ export class ProductsController {
   }
 
   @Get(':id')
+  @Public()
   findOne(@Param('id', ValidateMongoIdPipe) id: string) {
     return this.productsService.findOne(id)
   }

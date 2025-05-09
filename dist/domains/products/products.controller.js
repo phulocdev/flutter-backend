@@ -23,6 +23,7 @@ const pagination_query_dto_1 = require("../../core/query-string-dtos/pagination-
 const validate_date_range_pipe_1 = require("../../core/pipes/validate-date-range.pipe");
 const date_range_query_dto_1 = require("../../core/query-string-dtos/date-range-query.dto");
 const product_query_dto_1 = require("./dto/product-query-dto");
+const public_decorator_1 = require("../../core/decorators/public.decorator");
 let ProductsController = exports.ProductsController = class ProductsController {
     constructor(productsService) {
         this.productsService = productsService;
@@ -51,6 +52,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ProductsController.prototype, "create", null);
 __decorate([
+    (0, public_decorator_1.Public)(),
     (0, common_1.Get)(),
     (0, response_message_decorator_1.ResponseMessage)('Fetch danh sách sản phẩm thành công'),
     __param(0, (0, common_1.Query)()),
@@ -64,6 +66,7 @@ __decorate([
 ], ProductsController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)(':id'),
+    (0, public_decorator_1.Public)(),
     __param(0, (0, common_1.Param)('id', validate_mongo_id_pipe_1.ValidateMongoIdPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),

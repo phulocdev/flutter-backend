@@ -3,7 +3,7 @@ import * as mongoose from 'mongoose'
 
 export type CategoryDocument = mongoose.HydratedDocument<Category>
 
-@Schema({ versionKey: false, collection: 'Categories' })
+@Schema({ versionKey: false, collection: 'Categories', timestamps: true })
 export class Category {
   @Prop({ required: true, type: String })
   name: string

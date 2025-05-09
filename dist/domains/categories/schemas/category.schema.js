@@ -50,7 +50,7 @@ __decorate([
     __metadata("design:type", String)
 ], Category.prototype, "imageUrl", void 0);
 exports.Category = Category = __decorate([
-    (0, mongoose_1.Schema)({ versionKey: false, collection: 'Categories' })
+    (0, mongoose_1.Schema)({ versionKey: false, collection: 'Categories', timestamps: true })
 ], Category);
 exports.CategorySchema = mongoose_1.SchemaFactory.createForClass(Category);
 exports.CategorySchema.index({ name: 1, parentCategory: 1 }, { unique: true });
