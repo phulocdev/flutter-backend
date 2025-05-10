@@ -6,10 +6,11 @@ import { AccountsModule } from './domains/accounts/accounts.module'
 import { AuthModule } from 'domains/auth/auth.module'
 import { MediaModule } from './domains/media/media.module'
 import { ProductsModule } from './domains/products/products.module'
-import { CartsModule } from './domains/carts/carts.module'
 import { CategoriesModule } from './domains/categories/categories.module'
 import { OrdersModule } from 'domains/orders/orders.module'
 import { CloudinaryModule } from 'domains/cloudinary/cloudinary.module'
+import { BrandsModule } from './domains/brands/brands.module'
+import { CartModule } from './domains/cart/cart.module'
 
 @Module({
   imports: [
@@ -19,9 +20,10 @@ import { CloudinaryModule } from 'domains/cloudinary/cloudinary.module'
     MediaModule,
     OrdersModule,
     ProductsModule,
-    CartsModule,
     CategoriesModule,
-    CloudinaryModule
+    CloudinaryModule,
+    BrandsModule,
+    CartModule
   ],
   controllers: [AppController],
   providers: [AppService]

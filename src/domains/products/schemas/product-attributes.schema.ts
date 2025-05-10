@@ -15,5 +15,4 @@ export class ProductAttribute {
 
 export const ProductAttributeSchema = SchemaFactory.createForClass(ProductAttribute)
 
-// ✅ Tạo Composite Unique Index cho cặp `product` + `name`
 ProductAttributeSchema.index({ product: 1, name: 1 }, { unique: true })

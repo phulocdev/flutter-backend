@@ -20,6 +20,7 @@ import { ProductAttributeSku, ProductAttributeSkuSchema } from 'domains/products
     ])
   ],
   controllers: [ProductsController],
-  providers: [ProductsService]
+  providers: [ProductsService],
+  exports: [ProductsService]
 })
 export class ProductsModule {}

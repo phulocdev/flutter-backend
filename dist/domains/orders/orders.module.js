@@ -11,12 +11,20 @@ const common_1 = require("@nestjs/common");
 const orders_service_1 = require("./orders.service");
 const orders_controller_1 = require("./orders.controller");
 const mongoose_1 = require("@nestjs/mongoose");
-const order_schema_1 = require("../carts/schemas/order.schema");
+const order_schema_1 = require("./schemas/order.schema");
+const order_item_schema_1 = require("./schemas/order-item.schema");
+const products_module_1 = require("../products/products.module");
 let OrdersModule = exports.OrdersModule = class OrdersModule {
 };
 exports.OrdersModule = OrdersModule = __decorate([
     (0, common_1.Module)({
-        imports: [mongoose_1.MongooseModule.forFeature([{ name: order_schema_1.Order.name, schema: order_schema_1.OrderSchema }])],
+        imports: [
+            mongoose_1.MongooseModule.forFeature([
+                { name: order_schema_1.Order.name, schema: order_schema_1.OrderSchema },
+                { name: order_item_schema_1.OrderItem.name, schema: order_item_schema_1.OrderItemSchema }
+            ]),
+            products_module_1.ProductsModule
+        ],
         controllers: [orders_controller_1.OrdersController],
         providers: [orders_service_1.OrdersService]
     })

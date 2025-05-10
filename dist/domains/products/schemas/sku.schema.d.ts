@@ -4,9 +4,11 @@ export type SkuDocument = mongoose.HydratedDocument<Sku>;
 export declare class Sku {
     product: Product | null;
     sku: string;
-    price: number;
-    stockQuantity: number;
-    images: string[];
+    barcode: string;
+    costPrice: number;
+    sellingPrice: number;
+    stockOnHand: number;
+    imageUrl: string;
 }
 export declare const SkuSchema: mongoose.Schema<Sku, mongoose.Model<Sku, any, any, any, mongoose.Document<unknown, any, Sku> & Sku & {
     _id: mongoose.Types.ObjectId;

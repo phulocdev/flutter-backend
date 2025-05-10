@@ -1,5 +1,7 @@
-import { CreateOrderDto } from './create-order.dto';
-declare const UpdateOrderDto_base: import("@nestjs/mapped-types").MappedType<Partial<CreateOrderDto>>;
-export declare class UpdateOrderDto extends UpdateOrderDto_base {
+import { OrderStatus } from 'core/constants/enum';
+export declare class UpdateOrderDto {
+    status: OrderStatus;
+    deliveredAt?: Date | undefined;
+    cancelledAt?: Date | undefined;
+    paymentAt?: Date | undefined;
 }
-export {};

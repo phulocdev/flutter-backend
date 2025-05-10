@@ -15,10 +15,11 @@ const accounts_module_1 = require("./domains/accounts/accounts.module");
 const auth_module_1 = require("./domains/auth/auth.module");
 const media_module_1 = require("./domains/media/media.module");
 const products_module_1 = require("./domains/products/products.module");
-const carts_module_1 = require("./domains/carts/carts.module");
 const categories_module_1 = require("./domains/categories/categories.module");
 const orders_module_1 = require("./domains/orders/orders.module");
 const cloudinary_module_1 = require("./domains/cloudinary/cloudinary.module");
+const brands_module_1 = require("./domains/brands/brands.module");
+const cart_module_1 = require("./domains/cart/cart.module");
 let AppModule = exports.AppModule = class AppModule {
 };
 exports.AppModule = AppModule = __decorate([
@@ -30,9 +31,10 @@ exports.AppModule = AppModule = __decorate([
             media_module_1.MediaModule,
             orders_module_1.OrdersModule,
             products_module_1.ProductsModule,
-            carts_module_1.CartsModule,
             categories_module_1.CategoriesModule,
-            cloudinary_module_1.CloudinaryModule
+            cloudinary_module_1.CloudinaryModule,
+            brands_module_1.BrandsModule,
+            cart_module_1.CartModule
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService]

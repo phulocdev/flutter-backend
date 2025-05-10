@@ -35,16 +35,25 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductSchema = exports.Product = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const enum_1 = require("../../../core/constants/enum");
+const brand_schema_1 = require("../../brands/schemas/brand.schema");
 const category_schema_1 = require("../../categories/schemas/category.schema");
 const mongoose = __importStar(require("mongoose"));
 let Product = exports.Product = class Product {
 };
 __decorate([
+    (0, mongoose_1.Prop)({ required: true, type: mongoose.Schema.Types.ObjectId }),
+    __metadata("design:type", mongoose.Types.ObjectId)
+], Product.prototype, "_id", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: true, type: String, unique: true }),
+    __metadata("design:type", String)
+], Product.prototype, "code", void 0);
+__decorate([
     (0, mongoose_1.Prop)({ required: true, type: String }),
     __metadata("design:type", String)
 ], Product.prototype, "name", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true, type: String }),
+    (0, mongoose_1.Prop)({ required: false, type: String, default: '' }),
     __metadata("design:type", String)
 ], Product.prototype, "description", void 0);
 __decorate([
@@ -56,8 +65,8 @@ __decorate([
     __metadata("design:type", category_schema_1.Category)
 ], Product.prototype, "category", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true, type: String }),
-    __metadata("design:type", String)
+    (0, mongoose_1.Prop)({ required: true, type: mongoose.Schema.Types.ObjectId, ref: 'Brand' }),
+    __metadata("design:type", brand_schema_1.Brand)
 ], Product.prototype, "brand", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ required: false, type: String, enum: enum_1.ProductStatus, default: enum_1.ProductStatus.Published }),
@@ -67,6 +76,18 @@ __decorate([
     (0, mongoose_1.Prop)({ required: true, type: Number }),
     __metadata("design:type", Number)
 ], Product.prototype, "basePrice", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: true, type: Number }),
+    __metadata("design:type", Number)
+], Product.prototype, "minStockLevel", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: true, type: Number }),
+    __metadata("design:type", Number)
+], Product.prototype, "maxStockLevel", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: false, type: Number, default: 0 }),
+    __metadata("design:type", Number)
+], Product.prototype, "views", void 0);
 exports.Product = Product = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true, versionKey: false, collection: 'Products' })
 ], Product);

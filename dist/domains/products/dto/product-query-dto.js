@@ -12,27 +12,60 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductQueryDto = void 0;
 const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
+const enum_1 = require("../../../core/constants/enum");
 class ProductQueryDto {
 }
 exports.ProductQueryDto = ProductQueryDto;
 __decorate([
     (0, class_validator_1.MinLength)(5, { message: 'sort phải có ít nhất 5 ký tự' }),
-    (0, class_validator_1.IsString)({ message: 'sort phải là định dạng chuỗi' }),
+    (0, class_validator_1.IsString)({ message: 'sort phải là chuỗi' }),
     (0, class_transformer_1.Type)(() => String),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], ProductQueryDto.prototype, "sort", void 0);
 __decorate([
-    (0, class_validator_1.MinLength)(1, { message: 'name phải có ít nhất 1 ký tự' }),
-    (0, class_validator_1.IsString)({ message: 'name phải là định dạng chuỗi' }),
+    (0, class_validator_1.MinLength)(1, { message: 'code phải có ít nhất 1 ký tự' }),
+    (0, class_validator_1.IsString)({ message: 'code phải là chuỗi' }),
     (0, class_transformer_1.Transform)(({ value }) => String(value).trim()),
-    (0, class_transformer_1.Type)(() => String),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], ProductQueryDto.prototype, "code", void 0);
+__decorate([
+    (0, class_validator_1.MinLength)(1, { message: 'name phải có ít nhất 1 ký tự' }),
+    (0, class_validator_1.IsString)({ message: 'name phải là chuỗi' }),
+    (0, class_transformer_1.Transform)(({ value }) => String(value).trim()),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], ProductQueryDto.prototype, "name", void 0);
 __decorate([
-    (0, class_validator_1.IsMongoId)({ message: 'parentCategory phải là định dạng ObjectId' }),
+    (0, class_validator_1.IsMongoId)({ message: 'categoryId phải là ObjectId hợp lệ' }),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
-], ProductQueryDto.prototype, "parentCategory", void 0);
+], ProductQueryDto.prototype, "categoryId", void 0);
+__decorate([
+    (0, class_validator_1.IsMongoId)({ message: 'brandId phải là ObjectId hợp lệ' }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], ProductQueryDto.prototype, "brandId", void 0);
+__decorate([
+    (0, class_validator_1.IsEnum)(enum_1.ProductStatus, {
+        message: `status phải là một trong các giá trị sau: ${Object.values(enum_1.ProductStatus).join(' || ')}`
+    }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], ProductQueryDto.prototype, "status", void 0);
+__decorate([
+    (0, class_transformer_1.Type)(() => Number),
+    (0, class_validator_1.IsNumber)({}, { message: 'minPrice phải là số' }),
+    (0, class_validator_1.Min)(0, { message: 'minPrice phải >= 0' }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Number)
+], ProductQueryDto.prototype, "minPrice", void 0);
+__decorate([
+    (0, class_transformer_1.Type)(() => Number),
+    (0, class_validator_1.IsNumber)({}, { message: 'maxPrice phải là số' }),
+    (0, class_validator_1.Min)(0, { message: 'maxPrice phải >= 0' }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Number)
+], ProductQueryDto.prototype, "maxPrice", void 0);
 //# sourceMappingURL=product-query-dto.js.map

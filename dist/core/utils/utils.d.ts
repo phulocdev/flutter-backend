@@ -5,10 +5,7 @@ export declare const createMediaUrl: ({ baseUrl, filename, folderName }: {
     folderName?: string;
     filename: string;
 }) => string;
+export declare const generateProductCode: () => string;
 export declare const generateOrderCode: () => string;
 export declare const generateCustomerCode: () => string;
-export declare const generateSkuCode: ({ brand, attributeValues, productId }: {
-    brand: string;
-    attributeValues: string[];
-    productId: string;
-}) => string;
+export declare const generateSkuCode: () => string;

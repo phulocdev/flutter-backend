@@ -47,17 +47,25 @@ __decorate([
     __metadata("design:type", String)
 ], Sku.prototype, "sku", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true, type: Number }),
-    __metadata("design:type", Number)
-], Sku.prototype, "price", void 0);
+    (0, mongoose_1.Prop)({ required: true, type: String, unique: true }),
+    __metadata("design:type", String)
+], Sku.prototype, "barcode", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ required: true, type: Number }),
     __metadata("design:type", Number)
-], Sku.prototype, "stockQuantity", void 0);
+], Sku.prototype, "costPrice", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ default: [], type: [String] }),
-    __metadata("design:type", Array)
-], Sku.prototype, "images", void 0);
+    (0, mongoose_1.Prop)({ required: true, type: Number }),
+    __metadata("design:type", Number)
+], Sku.prototype, "sellingPrice", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: true, type: Number }),
+    __metadata("design:type", Number)
+], Sku.prototype, "stockOnHand", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: false, type: String, default: '' }),
+    __metadata("design:type", String)
+], Sku.prototype, "imageUrl", void 0);
 exports.Sku = Sku = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true, versionKey: false, collection: 'Skus' })
 ], Sku);

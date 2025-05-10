@@ -7,10 +7,13 @@ import { Sku } from 'domains/products/schemas/sku.schema'
 import mongoose, { FilterQuery, Model, Types } from 'mongoose'
 import { CreateProductDto } from './dto/create-product.dto'
 import { UpdateProductDto } from './dto/update-product.dto'
-import { generateSkuCode } from 'core/utils/utils'
+import { generateProductCode, generateSkuCode } from 'core/utils/utils'
 import { PaginationQueryDto } from 'core/query-string-dtos/pagination-query.dto'
 import { DateRangeQueryDto } from 'core/query-string-dtos/date-range-query.dto'
 import { ProductQueryDto } from 'domains/products/dto/product-query-dto'
+import { BadRequestError, NotFoundError, UnprocessableEntityError } from 'core/exceptions/errors.exception'
+import { IncreaseStockOnHandDto } from 'domains/products/dto/increase-stock-on-hand.dto'
+import { DecreaseStockOnHandDto } from 'domains/products/dto/decrease-stock-on-hand.dto'
 
 @Injectable()
 export class ProductsService {
@@ -25,53 +28,133 @@ export class ProductsService {
   async create(createProductDto: CreateProductDto) {
     const { attributeNames, skus, ...baseProductDto } = createProductDto
     const productId = new mongoose.Types.ObjectId()
+    const productCode = generateProductCode()
 
-    // Tạo danh sách thuộc tính sản phẩm một lần
-    const attributeDocuments = await this.productAttributeModel.insertMany(
-      attributeNames.map((name) => ({ product: productId, name }))
-    )
+    // SP không có thuộc tính
+    if (skus && skus.length === 0) {
+      throw new UnprocessableEntityError([{ field: 'skus', message: 'skus không hợp lệ phải có ít nhất một phần tử' }])
+    }
 
-    // Tạo danh sách SKU
-    const skuDocuments = await this.skuModel.insertMany(
-      skus.map((sku) => ({
-        price: sku.price,
-        sku: generateSkuCode({
-          brand: baseProductDto.brand,
-          attributeValues: sku.attributeValues,
-          productId: `${productId}`
-        }),
-        stockQuantity: sku.stockQuantity,
-        images: sku.images,
-        product: productId
-      }))
-    )
+    const session = await this.productModel.db.startSession()
+    try {
+      session.startTransaction()
+      let attributeDocuments: Array<any> = []
+      let skuDocuments: Array<any> = []
 
-    // Tạo bảng ánh xạ `productAttributeSku` bằng `bulkWrite`
-    const productAttributeSkuOperations = skus.flatMap((sku, skuIndex) => {
-      return sku.attributeValues.map((attributeValue, attrIndex) => ({
-        insertOne: {
-          document: {
-            productAttribute: attributeDocuments[attrIndex]._id,
-            sku: skuDocuments[skuIndex]._id,
-            value: attributeValue
+      // Tạo Documents cho ProductAttributes Collection trước
+      if (attributeNames && attributeNames.length > 0) {
+        attributeDocuments = await this.productAttributeModel.insertMany(
+          attributeNames.map((name) => ({ product: productId, name })),
+          { session }
+        )
+      }
+
+      // Tiếp đó là tạo Documents cho Skus Collection
+      if (skus && skus.length > 0) {
+        skuDocuments = await this.skuModel.insertMany(
+          skus.map((sku) => {
+            const { ...skuFieldValues } = sku
+            return {
+              ...skuFieldValues,
+              product: productId,
+              barcode: generateSkuCode(),
+              sku: generateSkuCode()
+            }
+          }),
+          { session }
+        )
+      }
+
+      // Create attribute-SKU mappings
+      if (attributeDocuments.length > 0 && skuDocuments.length > 0) {
+        const attributeNameToIdMap = new Map<string, mongoose.Types.ObjectId>()
+        attributeDocuments.forEach((attr, index) => {
+          attributeNameToIdMap.set(attributeNames![index], attr._id)
+        })
+
+        const productAttributeSkuOperations: Array<any> = []
+
+        // Ràng buộc giữa Client và Server là, thú tự của các AttributeValues phải khớp với thứ tự của AttributeNames
+        skus!.forEach((sku, skuIndex) => {
+          if (sku.attributeValues && sku.attributeValues.length === attributeNames!.length) {
+            sku.attributeValues.forEach((attributeValue, attrIndex) => {
+              const attributeName = attributeNames![attrIndex]
+              const attributeId = attributeNameToIdMap.get(attributeName)
+
+              productAttributeSkuOperations.push({
+                insertOne: {
+                  document: {
+                    productAttribute: attributeId,
+                    sku: skuDocuments[skuIndex]._id,
+                    value: attributeValue
+                  }
+                }
+              })
+            })
+          } else {
+            throw new Error(
+              `SKU at index ${skuIndex} has invalid attribute values count. Expected ${attributeNames!.length}, got ${
+                sku.attributeValues?.length || 0
+              }`
+            )
           }
-        }
-      }))
-    })
-    await this.productAttributeSkuModel.bulkWrite(productAttributeSkuOperations)
+        })
 
-    return this.productModel.create({ _id: productId, ...baseProductDto })
+        // Thêm các Documents vào bảng trung gian giữa ProductAttribute và Sku
+        if (productAttributeSkuOperations.length > 0) {
+          await this.productAttributeSkuModel.bulkWrite(productAttributeSkuOperations, { session })
+        }
+      }
+
+      const createdProduct = await this.productModel.create(
+        [{ _id: productId, code: productCode, ...baseProductDto }],
+        { session }
+      )
+      await session.commitTransaction()
+
+      return createdProduct[0]
+    } catch (error) {
+      await session.abortTransaction()
+      throw error
+    } finally {
+      session.endSession()
+    }
   }
 
   async findAll(qs: PaginationQueryDto & DateRangeQueryDto & ProductQueryDto) {
-    const { page, limit, from, to, sort: sortQuery, ...filterRest } = qs
-    const filter: FilterQuery<ProductDocument> = filterRest
+    const { page, limit, from, to, sort: sortQuery, name, brandId, categoryId, code, maxPrice, minPrice, status } = qs
+    // sort và status là những query có gtri đặc biệt -> phải transform thành cú pháp hợp lệ trước khi mà thực hiện filter
+    // customerCode và tableNumber là query đặc biệt -> dùng để query nested Object
+    // Cho nên ta phải tasck 3 query value đó ra riêng
 
-    let sort = '-createdAt'
+    // Filter key of nested object
+
+    const filter: FilterQuery<Product> = {}
+    // if (qs.customerId) {
+    //   filter.customer = new Types.ObjectId(qs.customerId)
+    // }
+
+    // if (status) {
+    //   filter.status = { $in: status }
+    // }
+
+    if (name) {
+      filter.name = { $regex: name, $options: 'i' }
+    }
+
+    if (code) {
+      filter.code = { $regex: code, $options: 'i' }
+    }
+
+    // if (tableNumber) {
+    //   filter.tableNumber = { $in: tableNumber }
+    // }
+
+    let sort: Record<string, 1 | -1> = { createdAt: -1 }
     if (sortQuery) {
       const sortField = sortQuery.split('.')[0]
       const isDescending = sortQuery.split('.')[1] === 'desc'
-      sort = isDescending ? `-${sortField}` : sortField
+      sort = isDescending ? { [sortField]: -1 } : { [sortField]: 1 }
     }
 
     if (from || to) {
@@ -80,13 +163,13 @@ export class ProductsService {
       if (to) filter.createdAt.$lt = to
     }
 
-    const query = this.productModel.find(filter)
+    const query = this.productModel
+      .find(filter)
+      .sort(sort)
+      .populate([{ path: 'category' }, { path: 'brand' }])
 
     if (limit && page) {
-      query
-        .skip((page - 1) * limit)
-        .limit(limit)
-        .sort(sort)
+      query.skip((page - 1) * limit).limit(limit)
     }
 
     const [data, totalDocuments] = await Promise.all([query, this.productModel.countDocuments(filter)])
@@ -105,11 +188,23 @@ export class ProductsService {
   async findOne(productId: string) {
     const baseProductPromise = this.productModel
       .findById(productId)
-      .populate({ path: 'category', select: ['name', 'imageUrl', '-_id'] })
+      .populate([{ path: 'category' }, { path: 'brand' }])
+      .lean(true)
 
     const skuDocumentList = await this.skuModel.find({ product: productId })
     const skuIds = skuDocumentList.map((sku) => sku._id)
 
+    // TH: SP chỉ có 1 biến thể duy nhất (SP không có biến thể)
+    if (skuIds.length === 1) {
+      const [baseProduct] = await Promise.all([baseProductPromise])
+
+      return {
+        ...baseProduct,
+        skus: skuDocumentList
+      }
+    }
+
+    // TH: SP có nhiều biến thể
     const attributeAndVariantsPromise = this.productAttributeSkuModel.aggregate([
       {
         $match: { sku: { $in: skuIds } }
@@ -127,38 +222,48 @@ export class ProductsService {
       },
       {
         $facet: {
-          // Attribute Options: Lấy các thuộc tính của sản phẩm
-          attributeOptions: [
-            {
-              $group: {
-                _id: '$attributeInfo.name',
-                values: { $addToSet: '$value' } // Loại bỏ giá trị trùng lặp
-              }
-            },
-            {
-              $project: {
-                _id: 0,
-                keyValue: { $arrayToObject: [[{ k: '$_id', v: '$values' }]] }
-              }
-            },
-            {
-              $replaceRoot: { newRoot: '$keyValue' }
-            }
-          ],
+          // Format attributeOptions to: { name: string, values: string[] }
+          // attributeOptions: [
+          //   {
+          //     $group: {
+          //       _id: '$attributeInfo.name',
+          //       values: { $addToSet: '$value' }
+          //     }
+          //   },
+          //   {
+          //     $project: {
+          //       _id: 0,
+          //       name: '$_id',
+          //       values: 1
+          //     }
+          //   }
+          // ],
 
-          // Variants: Lấy danh sách SKU và các thuộc tính của SKU đó
+          // Format variants.skus[n].attributes to: { name: string, values: string[] }
           variants: [
             {
               $group: {
                 _id: '$sku',
-                attributes: {
-                  $push: { k: '$attributeInfo.name', v: '$value' }
+                attributesArray: {
+                  $push: {
+                    name: '$attributeInfo.name',
+                    values: ['$value']
+                  }
                 }
               }
             },
             {
               $addFields: {
-                attributes: { $arrayToObject: '$attributes' }
+                attributes: {
+                  $map: {
+                    input: '$attributesArray',
+                    as: 'item',
+                    in: {
+                      name: '$$item.name',
+                      value: { $arrayElemAt: ['$$item.values', 0] }
+                    }
+                  }
+                }
               }
             },
             {
@@ -169,14 +274,21 @@ export class ProductsService {
                 as: 'skuInfo'
               }
             },
-            { $unwind: { path: '$skuInfo', preserveNullAndEmptyArrays: true } },
             {
-              $replaceRoot: { newRoot: { $mergeObjects: ['$skuInfo', '$$ROOT'] } }
+              $unwind: { path: '$skuInfo', preserveNullAndEmptyArrays: true }
+            },
+            {
+              $replaceRoot: {
+                newRoot: {
+                  $mergeObjects: ['$skuInfo', '$$ROOT']
+                }
+              }
             },
             {
               $project: {
                 skuInfo: 0,
-                product: 0
+                product: 0,
+                attributesArray: 0
               }
             }
           ]
@@ -186,21 +298,341 @@ export class ProductsService {
 
     const [baseProduct, { attributeOptions, variants }] = await Promise.all([
       baseProductPromise,
-      attributeAndVariantsPromise.then((res) => res[0]) // Lấy phần tử đầu tiên của kết quả
+      attributeAndVariantsPromise.then((res) => res[0])
     ])
 
     return {
-      ...baseProduct.toObject(),
+      ...baseProduct,
       attributeOptions,
       skus: variants
     }
   }
 
-  update(id: string, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`
+  async update(_id: string, updateProductDto: UpdateProductDto) {
+    const { attributeNames, skus, ...baseProductDto } = updateProductDto
+
+    if (attributeNames && !skus) {
+      throw new UnprocessableEntityError([{ field: 'skus', message: 'skus không được bỏ trống' }])
+    }
+
+    if (!attributeNames && skus) {
+      throw new UnprocessableEntityError([{ field: 'attributeNames', message: 'attributeNames không được bỏ trống' }])
+    }
+
+    const session = await this.productModel.db.startSession()
+    try {
+      session.startTransaction()
+
+      // TH1: Không cập nhật liên quan đến biến thể
+      if (!attributeNames || !skus) {
+        const updatedProduct = await this.productModel.findOneAndUpdate({ _id }, baseProductDto, { new: true, session })
+        await session.commitTransaction()
+        return updatedProduct
+      }
+
+      // TH2: Không cập nhật các biến thể của sản phẩm
+      // 1. Find and remove related records
+      const productAttributes = await this.productAttributeModel.find({ product: _id })
+      const productAttributeIds = productAttributes.map((prodAtt) => prodAtt._id)
+
+      await Promise.all([
+        this.productAttributeModel.deleteMany({ product: _id }).session(session),
+        this.productAttributeSkuModel.deleteMany({ productAttribute: { $in: productAttributeIds } }).session(session),
+        this.skuModel.deleteMany({ product: _id }).session(session)
+      ])
+
+      // 2. Create new attributes and SKUs
+      let attributeDocuments: Array<any> = []
+      let skuDocuments: Array<any> = []
+
+      if (attributeNames.length > 0) {
+        attributeDocuments = await this.productAttributeModel.insertMany(
+          attributeNames.map((name) => ({ product: _id, name })),
+          { session }
+        )
+      }
+
+      if (skus.length > 0) {
+        skuDocuments = await this.skuModel.insertMany(
+          skus.map((sku) => {
+            const { attributeValues, ...skuFieldValues } = sku
+            return {
+              ...skuFieldValues,
+              product: _id,
+              barcode: generateSkuCode(),
+              sku: generateSkuCode()
+            }
+          }),
+          { session }
+        )
+      }
+
+      // 3. Create mapping between attributes and SKUs using a defined structure
+      if (attributeDocuments.length > 0 && skuDocuments.length > 0) {
+        const attributeNameToIdMap = new Map<string, mongoose.Types.ObjectId>()
+        attributeDocuments.forEach((attr, index) => {
+          attributeNameToIdMap.set(attributeNames[index], attr._id)
+        })
+
+        const productAttributeSkuOperations: Array<any> = []
+
+        skus.forEach((sku, skuIndex) => {
+          if (sku.attributeValues && sku.attributeValues.length === attributeNames.length) {
+            sku.attributeValues.forEach((attributeValue, attrIndex) => {
+              const attributeName = attributeNames[attrIndex]
+              const attributeId = attributeNameToIdMap.get(attributeName)
+
+              productAttributeSkuOperations.push({
+                insertOne: {
+                  document: {
+                    productAttribute: attributeId,
+                    sku: skuDocuments[skuIndex]._id,
+                    value: attributeValue
+                  }
+                }
+              })
+            })
+          } else {
+            throw new BadRequestError(
+              `SKU at index ${skuIndex} has invalid attribute values count. Expected ${attributeNames.length}, got ${
+                sku.attributeValues?.length || 0
+              }`
+            )
+          }
+        })
+
+        if (productAttributeSkuOperations.length > 0) {
+          await this.productAttributeSkuModel.bulkWrite(productAttributeSkuOperations, { session })
+        }
+      }
+
+      // 4. Update the base product
+      const updatedProduct = await this.productModel.findOneAndUpdate({ _id }, baseProductDto, { new: true, session })
+
+      await session.commitTransaction()
+      return updatedProduct
+    } catch (error) {
+      await session.abortTransaction()
+      throw error
+    } finally {
+      session.endSession()
+    }
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} product`
+  async remove(_id: string) {
+    const session = await this.productModel.db.startSession()
+    try {
+      session.startTransaction()
+
+      // Find related records to delete
+      const productAttributes = await this.productAttributeModel.find({ product: _id })
+      const productAttributeIds = productAttributes.map((prodAtt) => prodAtt._id)
+
+      // Delete all related records
+      await Promise.all([
+        this.productModel.deleteOne({ _id }).session(session),
+        this.productAttributeModel.deleteMany({ product: _id }).session(session),
+        this.productAttributeSkuModel.deleteMany({ productAttribute: { $in: productAttributeIds } }).session(session),
+        this.skuModel.deleteMany({ product: _id }).session(session)
+      ])
+
+      await session.commitTransaction()
+      return { deleted: true }
+    } catch (error) {
+      await session.abortTransaction()
+      throw error
+    } finally {
+      session.endSession()
+    }
+  }
+
+  async bulkRemove(ids: string[]) {
+    const session = await this.productModel.db.startSession()
+    try {
+      session.startTransaction()
+
+      const productAttributes = await this.productAttributeModel.find({ product: { $in: ids } })
+      const productAttributeIds = productAttributes.map((prodAtt) => prodAtt._id)
+
+      await Promise.all([
+        this.productModel.deleteMany({ _id: { $in: ids } }).session(session),
+        this.productAttributeModel.deleteMany({ product: { $in: ids } }).session(session),
+        this.productAttributeSkuModel.deleteMany({ productAttribute: { $in: productAttributeIds } }).session(session),
+        this.skuModel.deleteMany({ product: { $in: ids } }).session(session)
+      ])
+
+      await session.commitTransaction()
+      return { deleted: true }
+    } catch (error) {
+      await session.abortTransaction()
+      throw error
+    } finally {
+      session.endSession()
+    }
+  }
+
+  increaseStockOnHand(increaseStockOnHandDto: IncreaseStockOnHandDto) {
+    const { items } = increaseStockOnHandDto
+
+    const operations = items.map(({ sku, quantity }) => ({
+      updateOne: {
+        filter: { _id: sku },
+        update: { $inc: { stockOnHand: quantity } }
+      }
+    }))
+
+    this.skuModel.bulkWrite(operations)
+  }
+
+  decreaseStockOnHand(decreaseStockOnHandDto: DecreaseStockOnHandDto) {
+    const { items } = decreaseStockOnHandDto
+
+    const operations = items.map(({ sku, quantity }) => ({
+      updateOne: {
+        filter: { _id: sku },
+        update: { $inc: { stockOnHand: -quantity } }
+      }
+    }))
+
+    this.skuModel.bulkWrite(operations)
+  }
+
+  async findOneSku(skuId: string) {
+    const sku = await this.skuModel.findOne({ _id: skuId })
+
+    if (!sku) {
+      throw new NotFoundError('SKU không tồn tại')
+    }
+
+    return sku
+  }
+
+  async findAllSkus(skuIds: string[]): Promise<any[]> {
+    const objectIds = skuIds.map((id) => new Types.ObjectId(id))
+
+    return this.skuModel.aggregate([
+      {
+        $match: {
+          _id: { $in: objectIds }
+        }
+      },
+      {
+        $lookup: {
+          from: 'Products',
+          localField: 'product',
+          foreignField: '_id',
+          as: 'product'
+        }
+      },
+      { $unwind: { path: '$product', preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: 'Categories',
+          localField: 'product.category',
+          foreignField: '_id',
+          as: 'productCategory'
+        }
+      },
+      { $unwind: { path: '$productCategory', preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: 'Brands',
+          localField: 'product.brand',
+          foreignField: '_id',
+          as: 'productBrand'
+        }
+      },
+      { $unwind: { path: '$productBrand', preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: 'ProductAttributeSku',
+          let: { skuId: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ['$sku', '$$skuId'] }
+              }
+            }
+          ],
+          as: 'attributeSkus'
+        }
+      },
+      {
+        $lookup: {
+          from: 'ProductAttributes',
+          let: { attrSkus: '$attributeSkus' },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $in: [
+                    '$_id',
+                    {
+                      $map: {
+                        input: '$$attrSkus',
+                        as: 'asku',
+                        in: '$$asku.productAttribute'
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          as: 'attributesInfo'
+        }
+      },
+      {
+        $addFields: {
+          attributes: {
+            $map: {
+              input: '$attributeSkus',
+              as: 'asku',
+              in: {
+                value: '$$asku.value',
+                name: {
+                  $let: {
+                    vars: {
+                      attr: {
+                        $arrayElemAt: [
+                          {
+                            $filter: {
+                              input: '$attributesInfo',
+                              as: 'ainfo',
+                              cond: { $eq: ['$$ainfo._id', '$$asku.productAttribute'] }
+                            }
+                          },
+                          0
+                        ]
+                      }
+                    },
+                    in: '$$attr.name'
+                  }
+                }
+              }
+            }
+          },
+          product: {
+            $mergeObjects: [
+              '$product',
+              {
+                category: '$productCategory',
+                brand: '$productBrand'
+              }
+            ]
+          }
+        }
+      },
+      {
+        $project: {
+          minStockLevel: 0,
+          maxStockLevel: 0,
+          attributeSkus: 0,
+          attributesInfo: 0,
+          productCategory: 0,
+          productBrand: 0
+        }
+      }
+    ])
   }
 }

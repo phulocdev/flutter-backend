@@ -33,15 +33,15 @@ import { ProductQueryDto } from 'domains/products/dto/product-query-dto';
 export declare class ProductsController {
     private readonly productsService;
     constructor(productsService: ProductsService);
-    create(createProductDto: CreateProductDto): Promise<import("mongoose").Document<unknown, {}, import("./schemas/product.schema").Product> & import("./schemas/product.schema").Product & {
+    create(createProductDto: CreateProductDto): Promise<import("mongoose").Document<unknown, {}, import("./schemas/product.schema").Product> & import("./schemas/product.schema").Product & Required<{
         _id: import("mongoose").Types.ObjectId;
-    } & {
+    }> & {
         __v: number;
     }>;
     findAll(paginationQuery: PaginationQueryDto, dateRangeQuery: DateRangeQueryDto, categoryQuery: ProductQueryDto): Promise<{
-        data: (import("mongoose").Document<unknown, {}, import("./schemas/product.schema").Product> & import("./schemas/product.schema").Product & {
+        data: (import("mongoose").Document<unknown, {}, import("./schemas/product.schema").Product> & import("./schemas/product.schema").Product & Required<{
             _id: import("mongoose").Types.ObjectId;
-        } & {
+        }> & {
             __v: number;
         })[];
         meta: {
@@ -52,18 +52,69 @@ export declare class ProductsController {
         };
     }>;
     findOne(id: string): Promise<{
-        attributeOptions: any;
-        skus: any;
+        skus: (import("mongoose").Document<unknown, {}, import("./schemas/sku.schema").Sku> & import("./schemas/sku.schema").Sku & {
+            _id: import("mongoose").Types.ObjectId;
+        } & {
+            __v: number;
+        })[];
+        _id: import("mongoose").Types.ObjectId;
+        code: string;
         name: string;
         description: string;
         imageUrl: string;
-        category: import("../categories/schemas/category.schema").Category;
-        brand: string;
+        category: import("mongoose").FlattenMaps<{
+            name: string;
+            parentCategory: import("mongoose").Document<unknown, {}, import("../categories/schemas/category.schema").Category> & import("../categories/schemas/category.schema").Category & {
+                _id: import("mongoose").Types.ObjectId;
+            } & {
+                __v: number;
+            };
+            imageUrl: string;
+        }>;
+        brand: import("mongoose").FlattenMaps<{
+            name: string;
+            imageUrl: string;
+        }>;
         status: import("../../core/constants/enum").ProductStatus;
         basePrice: number;
+        minStockLevel: number;
+        maxStockLevel: number;
+        views: number;
+        __v: number;
+    } | {
+        attributeOptions: any;
+        skus: any;
         _id: import("mongoose").Types.ObjectId;
+        code: string;
+        name: string;
+        description: string;
+        imageUrl: string;
+        category: import("mongoose").FlattenMaps<{
+            name: string;
+            parentCategory: import("mongoose").Document<unknown, {}, import("../categories/schemas/category.schema").Category> & import("../categories/schemas/category.schema").Category & {
+                _id: import("mongoose").Types.ObjectId;
+            } & {
+                __v: number;
+            };
+            imageUrl: string;
+        }>;
+        brand: import("mongoose").FlattenMaps<{
+            name: string;
+            imageUrl: string;
+        }>;
+        status: import("../../core/constants/enum").ProductStatus;
+        basePrice: number;
+        minStockLevel: number;
+        maxStockLevel: number;
+        views: number;
         __v: number;
     }>;
-    update(id: string, updateProductDto: UpdateProductDto): string;
-    remove(id: string): string;
+    update(id: string, updateProductDto: UpdateProductDto): Promise<import("mongoose").Document<unknown, {}, import("./schemas/product.schema").Product> & import("./schemas/product.schema").Product & Required<{
+        _id: import("mongoose").Types.ObjectId;
+    }> & {
+        __v: number;
+    }>;
+    remove(id: string): Promise<{
+        deleted: boolean;
+    }>;
 }
