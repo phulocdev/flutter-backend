@@ -2,14 +2,20 @@ import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { JwtService, TokenExpiredError } from '@nestjs/jwt'
 import { Role } from 'core/constants/enum'
-import { BadRequestError, NotFoundError, UnauthorizedError } from 'core/exceptions/errors.exception'
+import {
+  BadRequestError,
+  NotFoundError,
+  UnauthorizedError,
+  UnprocessableEntityError
+} from 'core/exceptions/errors.exception'
 import { AccountType, AuthTokenPayload } from 'core/types/type'
 import { AccountsService } from 'domains/accounts/accounts.service'
 import { ChangePasswordDto } from 'domains/auth/dtos/change-password.dto'
 import { ForgotPasswordtDto } from 'domains/auth/dtos/forgot-password.dto'
 import { LogoutDto } from 'domains/auth/dtos/logout.dto'
 import { RefreshTokenDto } from 'domains/auth/dtos/refresh-token.dto'
-import { RegisterAccountDto } from 'domains/auth/dtos/register-account-dto'
+import { RegisterAccountGuestDto } from 'domains/auth/dtos/register-account-guest.dto'
+import { RegisterAccountDto } from 'domains/auth/dtos/register-account.dto'
 import mongoose from 'mongoose'
 import ms, { StringValue } from 'ms'
 
@@ -45,10 +51,37 @@ export class AuthService {
     }
   }
 
-  async register(registerAccountDto: RegisterAccountDto) {
-    const { email, fullName, password, address } = registerAccountDto
+  async registerGuest(registerAccountGuestDto: RegisterAccountGuestDto): Promise<AccountType> {
+    const existingAccount = await this.accountsService.findByEmail(registerAccountGuestDto.email)
 
+    if (!existingAccount) {
+      return this.accountsService.createForGuest(registerAccountGuestDto)
+    }
+
+    return {
+      _id: existingAccount._id,
+      avatarUrl: existingAccount.avatarUrl,
+      email: existingAccount.email,
+      fullName: existingAccount.fullName,
+      role: existingAccount.role
+    }
+  }
+
+  async register(registerAccountDto: RegisterAccountDto) {
     const accountId = new mongoose.Types.ObjectId().toString()
+    const { email, fullName, password, address } = registerAccountDto
+    const existingAccount = await this.accountsService.findByEmail(email)
+    let account: AccountType | undefined
+
+    if (existingAccount) {
+      if (!existingAccount.isGuest) {
+        throw new UnprocessableEntityError([{ field: 'email', message: 'Email này đã tồn tại trên hệ thống' }])
+      }
+      account = await this.accountsService.findOneAndUpdateByEmail(email, { ...registerAccountDto, isGuest: false })
+    } else {
+      account = await this.accountsService.create({ address, email, fullName, password, _id: accountId })
+    }
+
     const [accessToken, refreshToken] = await Promise.all([
       this.signAccessToken({
         _id: accountId,
@@ -66,13 +99,6 @@ export class AuthService {
       })
     ])
 
-    const account = await this.accountsService.create({
-      email,
-      password,
-      fullName,
-      address,
-      _id: accountId
-    })
     this.accountsService.updateRefreshToken(accountId, refreshToken)
 
     return {
@@ -149,7 +175,12 @@ export class AuthService {
 
     return {
       accessToken,
-      refreshToken
+      refreshToken,
+      account: {
+        email: account.email,
+        fullName: account.fullName,
+        role: account.role
+      }
     }
   }
 

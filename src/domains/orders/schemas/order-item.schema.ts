@@ -13,7 +13,10 @@ export class OrderItem {
   quantity: number
 
   @Prop({ required: true, type: Number })
-  price: number
+  sellingPrice: number
+
+  @Prop({ required: true, type: Number })
+  costPrice: number
 
   @Prop({ type: Date, default: Date.now })
   createdAt?: string

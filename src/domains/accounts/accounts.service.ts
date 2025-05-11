@@ -8,18 +8,33 @@ import { Account, AccountDocument } from 'domains/accounts/schemas/account.schem
 import mongoose, { Model } from 'mongoose'
 import { CreateAccountDto } from './dto/create-account.dto'
 import { UpdateAccountDto } from './dto/update-account.dto'
+import { CreateGuestAccountDto } from 'domains/accounts/dto/create-account-guest.dto'
+import { AccountType } from 'core/types/type'
 
 @Injectable()
 export class AccountsService {
   private saltRounds = 10
   constructor(@InjectModel(Account.name) private accountModel: Model<AccountDocument>) {}
 
-  async create(createAccountDto: CreateAccountDto & { _id?: string }) {
-    const isExistAccount = await this.accountModel.findOne({ email: createAccountDto.email })
-    if (isExistAccount) {
-      throw new UnprocessableEntityError([{ field: 'email', message: 'Email này đã tồn tại trên hệ thống' }])
-    }
+  async createForGuest(createGuestAccountDto: CreateGuestAccountDto): Promise<AccountType> {
+    const hashedPassword = await this.hashPassword(Math.floor(Math.random() * 1000000).toString())
 
+    const newGuestAccount = await this.accountModel.create({
+      ...createGuestAccountDto,
+      isGuest: true,
+      password: hashedPassword
+    })
+
+    return {
+      _id: newGuestAccount._id,
+      avatarUrl: newGuestAccount.avatarUrl,
+      email: newGuestAccount.email,
+      fullName: newGuestAccount.fullName,
+      role: newGuestAccount.role
+    }
+  }
+
+  async create(createAccountDto: CreateAccountDto & { _id?: string }) {
     const hashedPassword = await this.hashPassword(createAccountDto.password)
     const newAccount = await this.accountModel.create({
       ...createAccountDto,
@@ -94,6 +109,24 @@ export class AccountsService {
       throw new NotFoundError('Tài khoản không tồn tại')
     }
     return this.accountModel.updateOne({ _id: id }, { ...updateAccountDto })
+  }
+
+  async findOneAndUpdateByEmail(email: string, updateAccountDto: UpdateAccountDto): Promise<AccountType> {
+    const hashedPassword = await this.hashPassword(updateAccountDto.password)
+
+    const updatedAccount = await this.accountModel.findOneAndUpdate(
+      { email },
+      { ...updateAccountDto, password: hashedPassword },
+      { $new: true }
+    )
+
+    return {
+      _id: updatedAccount._id,
+      avatarUrl: updatedAccount.avatarUrl,
+      email: updatedAccount.email,
+      fullName: updatedAccount.fullName,
+      role: updatedAccount.role
+    }
   }
 
   async updateRefreshToken(id: string, refreshToken: string) {

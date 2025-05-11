@@ -28,8 +28,11 @@ export class Account {
   @Prop({ required: true, type: String })
   password: string
 
-  @Prop({ required: true, type: String })
+  @Prop({ required: false, type: String, default: '' })
   fullName: string
+
+  @Prop({ required: false, type: Boolean, default: false })
+  isGuest: boolean
 
   // Khi mà thêm ? ở thuộc tính avatarUrl ở dưới thì chỉ có tác dụng để cho DEV hiểu rằng là khi create() thì có thể thêm trường đó
   // hoặc không thêm

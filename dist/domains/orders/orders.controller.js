@@ -25,6 +25,7 @@ const date_range_query_dto_1 = require("../../core/query-string-dtos/date-range-
 const order_query_dto_1 = require("./dto/order-query.dto");
 const validate_mongo_id_pipe_1 = require("../../core/pipes/validate-mongo-id.pipe");
 const bulk_delete_order_dto_1 = require("./dto/bulk-delete-order.dto");
+const public_decorator_1 = require("../../core/decorators/public.decorator");
 let OrdersController = exports.OrdersController = class OrdersController {
     constructor(ordersService) {
         this.ordersService = ordersService;
@@ -49,6 +50,7 @@ let OrdersController = exports.OrdersController = class OrdersController {
     }
 };
 __decorate([
+    (0, public_decorator_1.Public)(),
     (0, common_1.Post)(),
     (0, response_message_decorator_1.ResponseMessage)('Tạo mới đơn hàng thành công'),
     __param(0, (0, common_1.Body)()),

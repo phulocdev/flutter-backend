@@ -12,9 +12,15 @@ export class OrderItemDto {
   @IsNotEmpty({ message: 'items[index].quantity không được bỏ trống' })
   quantity: number
 
-  @Min(1, { message: 'items[index].price phải >= 1' })
-  @IsNumber({ allowNaN: false }, { message: 'items[index].price phải là định dạng số' })
+  @Min(1, { message: 'items[index].sellingPrice phải >= 1' })
+  @IsNumber({ allowNaN: false }, { message: 'items[index].sellingPrice phải là định dạng số' })
   @Transform(({ value }) => Number(value))
-  @IsNotEmpty({ message: 'items[index].price không được bỏ trống' })
-  price: number
+  @IsNotEmpty({ message: 'items[index].sellingPrice không được bỏ trống' })
+  sellingPrice: number
+
+  @Min(1, { message: 'items[index].costPrice phải >= 1' })
+  @IsNumber({ allowNaN: false }, { message: 'items[index].costPrice phải là định dạng số' })
+  @Transform(({ value }) => Number(value))
+  @IsNotEmpty({ message: 'items[index].costPrice không được bỏ trống' })
+  costPrice: number
 }

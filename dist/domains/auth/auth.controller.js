@@ -24,7 +24,8 @@ const forgot_password_dto_1 = require("./dtos/forgot-password.dto");
 const login_dto_1 = require("./dtos/login.dto");
 const logout_dto_1 = require("./dtos/logout.dto");
 const refresh_token_dto_1 = require("./dtos/refresh-token.dto");
-const register_account_dto_1 = require("./dtos/register-account-dto");
+const register_account_guest_dto_1 = require("./dtos/register-account-guest.dto");
+const register_account_dto_1 = require("./dtos/register-account.dto");
 let AuthController = exports.AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
@@ -34,6 +35,9 @@ let AuthController = exports.AuthController = class AuthController {
     }
     register(registerAccountDto) {
         return this.authService.register(registerAccountDto);
+    }
+    registerForGuest(registerAccountGuestDto) {
+        return this.authService.registerGuest(registerAccountGuestDto);
     }
     refreshToken(refreshTokenDto) {
         return this.authService.refreshToken(refreshTokenDto);
@@ -68,6 +72,15 @@ __decorate([
     __metadata("design:paramtypes", [register_account_dto_1.RegisterAccountDto]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "register", null);
+__decorate([
+    (0, public_decorator_1.Public)(),
+    (0, common_1.Post)('register/guest'),
+    (0, response_message_decorator_1.ResponseMessage)('Đăng ký tài khoản cho khách hàng thành công'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [register_account_guest_dto_1.RegisterAccountGuestDto]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "registerForGuest", null);
 __decorate([
     (0, public_decorator_1.Public)(),
     (0, common_1.Post)('refresh-token'),

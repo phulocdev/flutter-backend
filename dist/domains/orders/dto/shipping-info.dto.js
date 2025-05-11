@@ -36,35 +36,11 @@ __decorate([
     __metadata("design:type", String)
 ], ShippingInfoDto.prototype, "phoneNumber", void 0);
 __decorate([
-    (0, class_validator_1.MaxLength)(60, { message: 'province không được vượt quá 60 kí tự' }),
-    (0, class_validator_1.MinLength)(2, { message: 'province phải có ít nhất 2 kí tự' }),
-    (0, class_validator_1.IsString)({ message: 'province phải là kiểu dữ liệu là string' }),
-    (0, class_validator_1.IsNotEmpty)({ message: 'province không được bỏ trống' }),
+    (0, class_validator_1.MaxLength)(100, { message: 'address không được vượt quá 100 kí tự' }),
+    (0, class_validator_1.MinLength)(2, { message: 'address phải có ít nhất 2 kí tự' }),
+    (0, class_validator_1.IsString)({ message: 'address phải là kiểu dữ liệu là string' }),
+    (0, class_validator_1.IsNotEmpty)({ message: 'address không được bỏ trống' }),
     (0, class_transformer_1.Transform)(({ value }) => String(value).trim()),
     __metadata("design:type", String)
-], ShippingInfoDto.prototype, "province", void 0);
-__decorate([
-    (0, class_validator_1.MaxLength)(60, { message: 'district không được vượt quá 60 kí tự' }),
-    (0, class_validator_1.MinLength)(2, { message: 'district phải có ít nhất 2 kí tự' }),
-    (0, class_validator_1.IsString)({ message: 'district phải là kiểu dữ liệu là string' }),
-    (0, class_validator_1.IsNotEmpty)({ message: 'district không được bỏ trống' }),
-    (0, class_transformer_1.Transform)(({ value }) => String(value).trim()),
-    __metadata("design:type", String)
-], ShippingInfoDto.prototype, "district", void 0);
-__decorate([
-    (0, class_validator_1.MaxLength)(60, { message: 'ward không được vượt quá 60 kí tự' }),
-    (0, class_validator_1.MinLength)(2, { message: 'ward phải có ít nhất 2 kí tự' }),
-    (0, class_validator_1.IsString)({ message: 'ward phải là kiểu dữ liệu là string' }),
-    (0, class_validator_1.IsNotEmpty)({ message: 'ward không được bỏ trống' }),
-    (0, class_transformer_1.Transform)(({ value }) => String(value).trim()),
-    __metadata("design:type", String)
-], ShippingInfoDto.prototype, "ward", void 0);
-__decorate([
-    (0, class_validator_1.MaxLength)(100, { message: 'detailedAddress không được vượt quá 100 kí tự' }),
-    (0, class_validator_1.MinLength)(2, { message: 'detailedAddress phải có ít nhất 2 kí tự' }),
-    (0, class_validator_1.IsString)({ message: 'detailedAddress phải là kiểu dữ liệu là string' }),
-    (0, class_validator_1.IsNotEmpty)({ message: 'detailedAddress không được bỏ trống' }),
-    (0, class_transformer_1.Transform)(({ value }) => String(value).trim()),
-    __metadata("design:type", String)
-], ShippingInfoDto.prototype, "detailedAddress", void 0);
+], ShippingInfoDto.prototype, "address", void 0);
 //# sourceMappingURL=shipping-info.dto.js.map

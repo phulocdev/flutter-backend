@@ -47,11 +47,22 @@ let AccountsService = exports.AccountsService = class AccountsService {
         this.accountModel = accountModel;
         this.saltRounds = 10;
     }
+    async createForGuest(createGuestAccountDto) {
+        const hashedPassword = await this.hashPassword(Math.floor(Math.random() * 1000000).toString());
+        const newGuestAccount = await this.accountModel.create({
+            ...createGuestAccountDto,
+            isGuest: true,
+            password: hashedPassword
+        });
+        return {
+            _id: newGuestAccount._id,
+            avatarUrl: newGuestAccount.avatarUrl,
+            email: newGuestAccount.email,
+            fullName: newGuestAccount.fullName,
+            role: newGuestAccount.role
+        };
+    }
     async create(createAccountDto) {
-        const isExistAccount = await this.accountModel.findOne({ email: createAccountDto.email });
-        if (isExistAccount) {
-            throw new errors_exception_1.UnprocessableEntityError([{ field: 'email', message: 'Email này đã tồn tại trên hệ thống' }]);
-        }
         const hashedPassword = await this.hashPassword(createAccountDto.password);
         const newAccount = await this.accountModel.create({
             ...createAccountDto,
@@ -114,6 +125,17 @@ let AccountsService = exports.AccountsService = class AccountsService {
             throw new errors_exception_1.NotFoundError('Tài khoản không tồn tại');
         }
         return this.accountModel.updateOne({ _id: id }, { ...updateAccountDto });
+    }
+    async findOneAndUpdateByEmail(email, updateAccountDto) {
+        const hashedPassword = await this.hashPassword(updateAccountDto.password);
+        const updatedAccount = await this.accountModel.findOneAndUpdate({ email }, { ...updateAccountDto, password: hashedPassword }, { $new: true });
+        return {
+            _id: updatedAccount._id,
+            avatarUrl: updatedAccount.avatarUrl,
+            email: updatedAccount.email,
+            fullName: updatedAccount.fullName,
+            role: updatedAccount.role
+        };
     }
     async updateRefreshToken(id, refreshToken) {
         return this.accountModel.updateOne({ _id: id }, { refreshToken });

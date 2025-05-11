@@ -17,39 +17,42 @@ class SkuDto {
 }
 exports.SkuDto = SkuDto;
 __decorate([
-    (0, class_validator_1.Min)(1, { message: 'skus[index].price phải > 0' }),
-    (0, class_validator_1.IsNumber)({ allowNaN: false }, { message: 'skus[index].price phải là định dạng số' }),
+    (0, class_validator_1.Min)(0, { message: 'skus[index].costPrice phải ≥ 0' }),
+    (0, class_validator_1.IsNumber)({ allowNaN: false }, { message: 'skus[index].costPrice phải là định dạng số' }),
     (0, class_transformer_1.Transform)(({ value }) => Number(value)),
-    (0, class_validator_1.IsNotEmpty)({ message: 'skus[index].price không được bỏ trống' }),
+    (0, class_validator_1.IsNotEmpty)({ message: 'skus[index].costPrice không được bỏ trống' }),
     __metadata("design:type", Number)
-], SkuDto.prototype, "price", void 0);
+], SkuDto.prototype, "costPrice", void 0);
 __decorate([
-    (0, class_validator_1.Min)(1, { message: 'skus[index].stockQuantity phải > 0' }),
-    (0, class_validator_1.IsInt)({ message: 'skus[index].stockQuantity phải là định dạng số nguyên' }),
+    (0, class_validator_1.Min)(1, { message: 'skus[index].sellingPrice phải >= 1' }),
+    (0, class_validator_1.IsNumber)({ allowNaN: false }, { message: 'skus[index].sellingPrice phải là định dạng số' }),
     (0, class_transformer_1.Transform)(({ value }) => Number(value)),
-    (0, class_validator_1.IsNotEmpty)({ message: 'skus[index].stockQuantity không được bỏ trống' }),
+    (0, class_validator_1.IsNotEmpty)({ message: 'skus[index].sellingPrice không được bỏ trống' }),
     __metadata("design:type", Number)
-], SkuDto.prototype, "stockQuantity", void 0);
+], SkuDto.prototype, "sellingPrice", void 0);
 __decorate([
-    (0, is_unique_array_decorator_1.IsUniqueArray)('Mỗi phần tử trong attributeValues không được trùng lặp'),
+    (0, class_validator_1.Min)(-1, { message: 'skus[index].stockOnHand phải >= 0' }),
+    (0, class_validator_1.IsInt)({ message: 'skus[index].stockOnHand phải là số nguyên' }),
+    (0, class_transformer_1.Transform)(({ value }) => Number(value)),
+    (0, class_validator_1.IsNotEmpty)({ message: 'skus[index].stockOnHand không được bỏ trống' }),
+    __metadata("design:type", Number)
+], SkuDto.prototype, "stockOnHand", void 0);
+__decorate([
+    (0, is_unique_array_decorator_1.IsUniqueArray)('Mỗi phần tử trong skus[index].attributeValues không được trùng lặp'),
     (0, class_validator_1.IsString)({
         each: true,
-        message: `Mỗi phần tử trong attributeValues phải là dạng chuỗi`
+        message: `Mỗi phần tử trong skus[index].attributeValues phải là dạng chuỗi`
     }),
-    (0, class_validator_1.MinLength)(3, { each: true, message: 'Mỗi phần tử trong skus[index].attributeValues phải có ít nhất 3 ký tự' }),
-    (0, class_validator_1.MaxLength)(20, { each: true, message: 'Mỗi phần tử trong skus[index].attributeValues không được vượt quá 20 ký tự' }),
+    (0, class_validator_1.MaxLength)(20, { each: true, message: 'Không được vượt quá 20 ký tự' }),
+    (0, class_validator_1.MinLength)(1, { each: true, message: 'Từng attribute phải có ít nhất 1 ký tự' }),
     (0, class_validator_1.IsArray)({ message: 'skus[index].attributeValues phải là định dạng mảng' }),
     (0, class_validator_1.IsNotEmpty)({ message: 'skus[index].attributeValues không được bỏ trống' }),
     __metadata("design:type", Array)
 ], SkuDto.prototype, "attributeValues", void 0);
 __decorate([
-    (0, is_unique_array_decorator_1.IsUniqueArray)('Các phần tử trong images không được trùng lặp'),
-    (0, class_validator_1.IsString)({
-        each: true,
-        message: `skus[index].Các phần tử trong images phải là dạng chuỗi`
-    }),
-    (0, class_validator_1.IsArray)({ message: 'skus[index].images phải là định dạng mảng' }),
+    (0, class_validator_1.IsString)({ message: 'sku[index].imageUrl phải là kiểu dữ liệu là string' }),
+    (0, class_transformer_1.Transform)(({ value }) => String(value).trim()),
     (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", Array)
-], SkuDto.prototype, "images", void 0);
+    __metadata("design:type", String)
+], SkuDto.prototype, "imageUrl", void 0);
 //# sourceMappingURL=sku.dto.js.map

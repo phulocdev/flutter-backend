@@ -28,10 +28,7 @@ export declare class ShippingInfo {
     name: string;
     email: string;
     phoneNumber: string;
-    province: string;
-    district: string;
-    ward: string;
-    detailedAddress: string;
+    address: string;
 }
 export declare const ShippingInfoSchema: import("mongoose").Schema<ShippingInfo, import("mongoose").Model<ShippingInfo, any, any, any, import("mongoose").Document<unknown, any, ShippingInfo> & ShippingInfo & {
     _id: import("mongoose").Types.ObjectId;

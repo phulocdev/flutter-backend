@@ -1,5 +1,16 @@
 import { Transform, Type } from 'class-transformer'
-import { ArrayMinSize, IsArray, IsEnum, IsNotEmpty, IsNumber, IsObject, Min, ValidateNested } from 'class-validator'
+import {
+  ArrayMinSize,
+  IsArray,
+  IsEnum,
+  IsMongoId,
+  IsNotEmpty,
+  IsNumber,
+  IsObject,
+  IsOptional,
+  Min,
+  ValidateNested
+} from 'class-validator'
 import { PaymentMethod, paymentMethodOptions } from 'core/constants/enum'
 import { OrderItemDto } from 'domains/orders/dto/order-item.dto'
 import { ShippingInfoDto } from 'domains/orders/dto/shipping-info.dto'
@@ -11,6 +22,10 @@ export class CreateOrderDto {
   @IsArray({ message: 'items phải là định dạng mảng' })
   @IsNotEmpty({ message: 'items không được bỏ trống' })
   items: OrderItemDto[]
+
+  @IsMongoId({ message: 'userId phải là định dạng ObjectId' })
+  @IsOptional()
+  userId?: string
 
   @Min(1, { message: 'totalPrice phải >= 1' })
   @IsNumber({ allowNaN: false }, { message: 'totalPrice phải là định dạng số' })

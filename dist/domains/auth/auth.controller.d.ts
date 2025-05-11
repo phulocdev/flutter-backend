@@ -31,7 +31,8 @@ import { ForgotPasswordtDto } from 'domains/auth/dtos/forgot-password.dto';
 import { LoginDto } from 'domains/auth/dtos/login.dto';
 import { LogoutDto } from 'domains/auth/dtos/logout.dto';
 import { RefreshTokenDto } from 'domains/auth/dtos/refresh-token.dto';
-import { RegisterAccountDto } from 'domains/auth/dtos/register-account-dto';
+import { RegisterAccountGuestDto } from 'domains/auth/dtos/register-account-guest.dto';
+import { RegisterAccountDto } from 'domains/auth/dtos/register-account.dto';
 export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);
@@ -43,14 +44,9 @@ export declare class AuthController {
     register(registerAccountDto: RegisterAccountDto): Promise<{
         accessToken: string;
         refreshToken: string;
-        account: {
-            _id: import("mongoose").Types.ObjectId;
-            email: string;
-            fullName: string;
-            avatarUrl: string;
-            role: import("../../core/constants/enum").Role;
-        };
+        account: AccountType;
     }>;
+    registerForGuest(registerAccountGuestDto: RegisterAccountGuestDto): Promise<AccountType>;
     refreshToken(refreshTokenDto: RefreshTokenDto): Promise<{
         accessToken: string;
         refreshToken: string;
@@ -66,6 +62,11 @@ export declare class AuthController {
     changePassword(changePasswordDto: ChangePasswordDto, account: AccountType): Promise<{
         accessToken: string;
         refreshToken: string;
+        account: {
+            email: string;
+            fullName: string;
+            role: import("../../core/constants/enum").Role;
+        };
     }>;
     logout(logoutDto: LogoutDto): Promise<void>;
 }

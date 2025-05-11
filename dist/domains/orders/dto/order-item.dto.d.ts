@@ -1,5 +1,6 @@
 export declare class OrderItemDto {
     sku: string;
     quantity: number;
-    price: number;
+    sellingPrice: number;
+    costPrice: number;
 }

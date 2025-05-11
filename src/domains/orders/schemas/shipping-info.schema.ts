@@ -12,16 +12,7 @@ export class ShippingInfo {
   phoneNumber: string
 
   @Prop({ type: String, required: true })
-  province: string
-
-  @Prop({ type: String, required: true })
-  district: string
-
-  @Prop({ type: String, required: true })
-  ward: string
-
-  @Prop({ type: String, required: true })
-  detailedAddress: string
+  address: string
 }
 
 export const ShippingInfoSchema = SchemaFactory.createForClass(ShippingInfo)

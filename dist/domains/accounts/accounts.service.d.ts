@@ -4,10 +4,13 @@ import { Account, AccountDocument } from 'domains/accounts/schemas/account.schem
 import mongoose, { Model } from 'mongoose';
 import { CreateAccountDto } from './dto/create-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
+import { CreateGuestAccountDto } from 'domains/accounts/dto/create-account-guest.dto';
+import { AccountType } from 'core/types/type';
 export declare class AccountsService {
     private accountModel;
     private saltRounds;
     constructor(accountModel: Model<AccountDocument>);
+    createForGuest(createGuestAccountDto: CreateGuestAccountDto): Promise<AccountType>;
     create(createAccountDto: CreateAccountDto & {
         _id?: string;
     }): Promise<{
@@ -112,6 +115,7 @@ export declare class AccountsService {
         _id: mongoose.Types.ObjectId;
     }>>;
     update(id: string, updateAccountDto: UpdateAccountDto): Promise<mongoose.UpdateWriteOpResult>;
+    findOneAndUpdateByEmail(email: string, updateAccountDto: UpdateAccountDto): Promise<AccountType>;
     updateRefreshToken(id: string, refreshToken: string): Promise<mongoose.UpdateWriteOpResult>;
     updatePassword(id: string, password: string): Promise<mongoose.UpdateWriteOpResult>;
     remove(id: string): Promise<mongoose.mongo.DeleteResult>;

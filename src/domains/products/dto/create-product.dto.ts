@@ -2,7 +2,7 @@ import { Transform, Type } from 'class-transformer'
 import {
   ArrayMinSize,
   IsArray,
-  IsEnum,
+  IsInt,
   IsMongoId,
   IsNotEmpty,
   IsNumber,
@@ -13,44 +13,41 @@ import {
   MinLength,
   ValidateNested
 } from 'class-validator'
-import { ProductStatus } from 'core/constants/enum'
 import { IsUniqueArray } from 'core/decorators/is-unique-array.decorator'
 import { SkuDto } from 'domains/products/dto/sku.dto'
-import { Types } from 'mongoose'
-
 export class CreateProductDto {
-  @MaxLength(100, { message: 'name không được vượt quá 100 kí tự' })
+  @MaxLength(200, { message: 'name không được vượt quá 200 kí tự' })
   @MinLength(2, { message: 'name phải có ít nhất 2 kí tự' })
   @IsString({ message: 'name phải là kiểu dữ liệu là string' })
-  @IsNotEmpty({ message: 'name không được  bỏ trống' })
+  @IsNotEmpty({ message: 'name không được bỏ trống' })
   @Transform(({ value }) => String(value).trim())
   name: string
 
   @MaxLength(1000, { message: 'description không được vượt quá 1000 kí tự' })
-  @MinLength(1, { message: 'description phải có ít nhất 1 kí tự' })
   @IsString({ message: 'description phải là kiểu dữ liệu là string' })
-  @IsNotEmpty({ message: 'description không được  bỏ trống' })
   @Transform(({ value }) => String(value).trim())
+  @IsOptional()
   description: string
 
   @IsMongoId({ message: 'category phải là định dạng ObjectId' })
   @IsNotEmpty({ message: 'category không được bỏ trống' })
-  category: Types.ObjectId
+  category: string
 
-  @MaxLength(20, { message: 'brand không được vượt quá 20 kí tự' })
-  @MinLength(1, { message: 'brand phải có ít nhất 1 kí tự' })
-  @IsString({ message: 'brand phải là kiểu dữ liệu là string' })
-  @IsNotEmpty({ message: 'brand không được  bỏ trống' })
-  @Transform(({ value }) => String(value).trim())
+  @IsMongoId({ message: 'brand phải là định dạng ObjectId' })
+  @IsNotEmpty({ message: 'brand không được bỏ trống' })
   brand: string
 
-  @IsEnum(ProductStatus, {
-    message: `status phải là một trong những giá trị sau: ${Object.values(ProductStatus).join(' || ')}`
-  })
-  @IsOptional()
-  status?: ProductStatus
+  // @IsMongoId({ message: 'supplier phải là định dạng ObjectId' })
+  // @IsOptional()
+  // supplier: string
 
-  @Min(1, { message: 'basePrice phải > 0' })
+  // @IsEnum(ProductStatus, {
+  //   message: `status phải là một trong những giá trị sau: ${Object.values(ProductStatus).join(' || ')}`
+  // })
+  // @IsOptional()
+  // status?: ProductStatus
+
+  @Min(1, { message: 'basePrice phải >= 1' })
   @IsNumber({ allowNaN: false }, { message: 'basePrice phải là định dạng số' })
   @Transform(({ value }) => Number(value))
   @IsNotEmpty({ message: 'basePrice không được bỏ trống' })
@@ -59,22 +56,36 @@ export class CreateProductDto {
   @IsString({ message: 'imageUrl phải là kiểu dữ liệu là string' })
   @Transform(({ value }) => String(value).trim())
   @IsOptional()
-  imageUrl?: string | undefined
+  imageUrl?: string
+
+  @Min(0, { message: 'minStockLevel phải ≥ 0' })
+  @IsInt({ message: 'minStockLevel phải là số nguyên' })
+  @Transform(({ value }) => Number(value))
+  @IsNotEmpty({ message: 'minStockLevel không được bỏ trống' })
+  minStockLevel: number
+
+  @Min(1, { message: 'maxStockLevel phải >= 1' })
+  @IsInt({ message: 'maxStockLevel phải là số nguyên' })
+  @Transform(({ value }) => Number(value))
+  @IsNotEmpty({ message: 'maxStockLevel không được bỏ trống' })
+  maxStockLevel: number
 
   @IsUniqueArray('Mỗi phần tử trong attributeNames không được trùng lặp')
   @IsString({
     each: true,
     message: `Mỗi phần tử trong attributeNames phải là dạng chuỗi`
   })
-  @MinLength(3, { each: true, message: 'Mỗi phần tử trong attributeNames phải có ít nhất 3 ký tự' })
+  @MinLength(1, { each: true, message: 'Mỗi phần tử trong attributeNames phải có ít nhất 1 ký tự' })
   @MaxLength(50, { each: true, message: 'Mỗi phần tử trong attributeNames không được vượt quá 50 ký tự' })
+  @ArrayMinSize(1, { message: 'attributeNames phải có ít nhất một phần tử' })
   @IsArray({ message: 'attributeNames phải là định dạng mảng' })
   @IsOptional()
-  attributeNames?: string[] | undefined
+  attributeNames?: string[]
 
+  // Khi tạo mới 1 SP, DÙ CÓ BIẾN THỂ hay không thì ta vẫn PHẢI TẠO ra một SKU cho nó - sku có attributeValues là 1 array rỗng
   @Type(() => SkuDto)
-  @ValidateNested({ each: true, message: 'Các phần tử trong skus không đúng định dạng' })
+  @ValidateNested({ each: true })
   @IsArray({ message: 'skus phải là định dạng mảng' })
-  @IsOptional()
-  skus?: SkuDto[] | undefined
+  @IsNotEmpty({ message: 'skus không được bỏ trống' })
+  skus: SkuDto[]
 }

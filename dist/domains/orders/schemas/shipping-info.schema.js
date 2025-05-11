@@ -28,19 +28,7 @@ __decorate([
 __decorate([
     (0, mongoose_1.Prop)({ type: String, required: true }),
     __metadata("design:type", String)
-], ShippingInfo.prototype, "province", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({ type: String, required: true }),
-    __metadata("design:type", String)
-], ShippingInfo.prototype, "district", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({ type: String, required: true }),
-    __metadata("design:type", String)
-], ShippingInfo.prototype, "ward", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({ type: String, required: true }),
-    __metadata("design:type", String)
-], ShippingInfo.prototype, "detailedAddress", void 0);
+], ShippingInfo.prototype, "address", void 0);
 exports.ShippingInfo = ShippingInfo = __decorate([
     (0, mongoose_1.Schema)({ _id: false, versionKey: false })
 ], ShippingInfo);

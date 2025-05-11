@@ -23,9 +23,13 @@ __decorate([
     __metadata("design:type", String)
 ], Account.prototype, "password", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true, type: String }),
+    (0, mongoose_1.Prop)({ required: false, type: String, default: '' }),
     __metadata("design:type", String)
 ], Account.prototype, "fullName", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: false, type: Boolean, default: false }),
+    __metadata("design:type", Boolean)
+], Account.prototype, "isGuest", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ required: false, type: String, default: '' }),
     __metadata("design:type", String)

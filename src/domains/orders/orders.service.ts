@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { OrderStatus } from 'core/constants/enum'
-import { NotFoundError } from 'core/exceptions/errors.exception'
+import { BadRequestError, NotFoundError } from 'core/exceptions/errors.exception'
 import { DateRangeQueryDto } from 'core/query-string-dtos/date-range-query.dto'
 import { PaginationQueryDto } from 'core/query-string-dtos/pagination-query.dto'
 import { AccountType } from 'core/types/type'
@@ -23,7 +23,11 @@ export class OrdersService {
     private readonly productsService: ProductsService
   ) {}
 
-  async create(createOrderDto: CreateOrderDto, account: AccountType) {
+  async create(createOrderDto: CreateOrderDto, account?: AccountType) {
+    if (!account && !createOrderDto.userId) {
+      throw new BadRequestError('Không thể tạo đơn hàng khi không có thông tin về KH')
+    }
+
     const { items } = createOrderDto
     const orderId = new mongoose.Types.ObjectId()
     const orderCode = generateOrderCode()
@@ -49,7 +53,7 @@ export class OrdersService {
             ...createOrderDto,
             _id: orderId,
             code: orderCode,
-            account: account._id
+            user: account ? account._id : createOrderDto.userId
           }
         ],
         { session }

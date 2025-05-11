@@ -3,7 +3,8 @@ export declare class OrderItem {
     order: Types.ObjectId;
     sku: Types.ObjectId;
     quantity: number;
-    price: number;
+    sellingPrice: number;
+    costPrice: number;
     createdAt?: string;
     updatedAt?: string;
 }

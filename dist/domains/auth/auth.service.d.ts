@@ -7,7 +7,8 @@ import { ChangePasswordDto } from 'domains/auth/dtos/change-password.dto';
 import { ForgotPasswordtDto } from 'domains/auth/dtos/forgot-password.dto';
 import { LogoutDto } from 'domains/auth/dtos/logout.dto';
 import { RefreshTokenDto } from 'domains/auth/dtos/refresh-token.dto';
-import { RegisterAccountDto } from 'domains/auth/dtos/register-account-dto';
+import { RegisterAccountGuestDto } from 'domains/auth/dtos/register-account-guest.dto';
+import { RegisterAccountDto } from 'domains/auth/dtos/register-account.dto';
 import mongoose from 'mongoose';
 export declare class AuthService {
     private readonly accountsService;
@@ -38,6 +39,7 @@ export declare class AuthService {
         }>;
         email: string;
         fullName: string;
+        isGuest: boolean;
         avatarUrl: string;
         address: string;
         role: Role;
@@ -49,16 +51,11 @@ export declare class AuthService {
         refreshToken: string;
         account: AccountType;
     }>;
+    registerGuest(registerAccountGuestDto: RegisterAccountGuestDto): Promise<AccountType>;
     register(registerAccountDto: RegisterAccountDto): Promise<{
         accessToken: string;
         refreshToken: string;
-        account: {
-            _id: mongoose.Types.ObjectId;
-            email: string;
-            fullName: string;
-            avatarUrl: string;
-            role: Role;
-        };
+        account: AccountType;
     }>;
     refreshToken(refreshTokenDto: RefreshTokenDto): Promise<{
         accessToken: string;
@@ -75,6 +72,11 @@ export declare class AuthService {
     changePassword(changePasswordDto: ChangePasswordDto, account: AccountType): Promise<{
         accessToken: string;
         refreshToken: string;
+        account: {
+            email: string;
+            fullName: string;
+            role: Role;
+        };
     }>;
     logout(logoutDto: LogoutDto): Promise<void>;
     signAccessToken(payload: AccountType): Promise<string>;

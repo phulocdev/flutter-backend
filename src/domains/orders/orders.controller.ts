@@ -11,14 +11,16 @@ import { DateRangeQueryDto } from 'core/query-string-dtos/date-range-query.dto'
 import { OrderQueryDto } from 'domains/orders/dto/order-query.dto'
 import { ValidateMongoIdPipe } from 'core/pipes/validate-mongo-id.pipe'
 import { BulkDeleteOrderDto } from 'domains/orders/dto/bulk-delete-order.dto'
+import { Public } from 'core/decorators/public.decorator'
 
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
+  @Public()
   @Post()
   @ResponseMessage('Tạo mới đơn hàng thành công')
-  create(@Body() createOrderDto: CreateOrderDto, @Account() account: AccountType) {
+  create(@Body() createOrderDto: CreateOrderDto, @Account() account?: AccountType) {
     return this.ordersService.create(createOrderDto, account)
   }
 

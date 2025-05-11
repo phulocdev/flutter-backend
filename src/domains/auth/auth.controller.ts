@@ -10,7 +10,8 @@ import { ForgotPasswordtDto } from 'domains/auth/dtos/forgot-password.dto'
 import { LoginDto } from 'domains/auth/dtos/login.dto'
 import { LogoutDto } from 'domains/auth/dtos/logout.dto'
 import { RefreshTokenDto } from 'domains/auth/dtos/refresh-token.dto'
-import { RegisterAccountDto } from 'domains/auth/dtos/register-account-dto'
+import { RegisterAccountGuestDto } from 'domains/auth/dtos/register-account-guest.dto'
+import { RegisterAccountDto } from 'domains/auth/dtos/register-account.dto'
 
 @Controller('auth')
 export class AuthController {
@@ -29,6 +30,13 @@ export class AuthController {
   @ResponseMessage('Đăng ký tài khoản thành công')
   register(@Body() registerAccountDto: RegisterAccountDto) {
     return this.authService.register(registerAccountDto)
+  }
+
+  @Public()
+  @Post('register/guest')
+  @ResponseMessage('Đăng ký tài khoản cho khách hàng thành công')
+  registerForGuest(@Body() registerAccountGuestDto: RegisterAccountGuestDto) {
+    return this.authService.registerGuest(registerAccountGuestDto)
   }
 
   @Public()

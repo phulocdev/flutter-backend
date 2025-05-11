@@ -19,31 +19,10 @@ export class ShippingInfoDto {
   @Transform(({ value }) => String(value).trim())
   phoneNumber: string
 
-  @MaxLength(60, { message: 'province không được vượt quá 60 kí tự' })
-  @MinLength(2, { message: 'province phải có ít nhất 2 kí tự' })
-  @IsString({ message: 'province phải là kiểu dữ liệu là string' })
-  @IsNotEmpty({ message: 'province không được bỏ trống' })
+  @MaxLength(100, { message: 'address không được vượt quá 100 kí tự' })
+  @MinLength(2, { message: 'address phải có ít nhất 2 kí tự' })
+  @IsString({ message: 'address phải là kiểu dữ liệu là string' })
+  @IsNotEmpty({ message: 'address không được bỏ trống' })
   @Transform(({ value }) => String(value).trim())
-  province: string
-
-  @MaxLength(60, { message: 'district không được vượt quá 60 kí tự' })
-  @MinLength(2, { message: 'district phải có ít nhất 2 kí tự' })
-  @IsString({ message: 'district phải là kiểu dữ liệu là string' })
-  @IsNotEmpty({ message: 'district không được bỏ trống' })
-  @Transform(({ value }) => String(value).trim())
-  district: string
-
-  @MaxLength(60, { message: 'ward không được vượt quá 60 kí tự' })
-  @MinLength(2, { message: 'ward phải có ít nhất 2 kí tự' })
-  @IsString({ message: 'ward phải là kiểu dữ liệu là string' })
-  @IsNotEmpty({ message: 'ward không được bỏ trống' })
-  @Transform(({ value }) => String(value).trim())
-  ward: string
-
-  @MaxLength(100, { message: 'detailedAddress không được vượt quá 100 kí tự' })
-  @MinLength(2, { message: 'detailedAddress phải có ít nhất 2 kí tự' })
-  @IsString({ message: 'detailedAddress phải là kiểu dữ liệu là string' })
-  @IsNotEmpty({ message: 'detailedAddress không được bỏ trống' })
-  @Transform(({ value }) => String(value).trim())
-  detailedAddress: string
+  address: string
 }

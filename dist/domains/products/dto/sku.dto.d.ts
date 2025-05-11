@@ -1,6 +1,7 @@
 export declare class SkuDto {
-    price: number;
-    stockQuantity: number;
+    costPrice: number;
+    sellingPrice: number;
+    stockOnHand: number;
     attributeValues: string[];
-    images?: string[] | undefined;
+    imageUrl?: string;
 }

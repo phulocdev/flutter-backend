@@ -1,7 +1,8 @@
 import { ProductStatus, Role } from 'core/constants/enum'
+import mongoose from 'mongoose'
 
 export type AccountType = {
-  _id: string
+  _id: string | mongoose.Types.ObjectId
   email: string
   fullName: string
   avatarUrl: string

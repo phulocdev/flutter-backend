@@ -28,10 +28,17 @@ __decorate([
     __metadata("design:type", Number)
 ], OrderItemDto.prototype, "quantity", void 0);
 __decorate([
-    (0, class_validator_1.Min)(1, { message: 'items[index].price phải >= 1' }),
-    (0, class_validator_1.IsNumber)({ allowNaN: false }, { message: 'items[index].price phải là định dạng số' }),
+    (0, class_validator_1.Min)(1, { message: 'items[index].sellingPrice phải >= 1' }),
+    (0, class_validator_1.IsNumber)({ allowNaN: false }, { message: 'items[index].sellingPrice phải là định dạng số' }),
     (0, class_transformer_1.Transform)(({ value }) => Number(value)),
-    (0, class_validator_1.IsNotEmpty)({ message: 'items[index].price không được bỏ trống' }),
+    (0, class_validator_1.IsNotEmpty)({ message: 'items[index].sellingPrice không được bỏ trống' }),
     __metadata("design:type", Number)
-], OrderItemDto.prototype, "price", void 0);
+], OrderItemDto.prototype, "sellingPrice", void 0);
+__decorate([
+    (0, class_validator_1.Min)(1, { message: 'items[index].costPrice phải >= 1' }),
+    (0, class_validator_1.IsNumber)({ allowNaN: false }, { message: 'items[index].costPrice phải là định dạng số' }),
+    (0, class_transformer_1.Transform)(({ value }) => Number(value)),
+    (0, class_validator_1.IsNotEmpty)({ message: 'items[index].costPrice không được bỏ trống' }),
+    __metadata("design:type", Number)
+], OrderItemDto.prototype, "costPrice", void 0);
 //# sourceMappingURL=order-item.dto.js.map

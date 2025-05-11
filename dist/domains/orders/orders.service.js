@@ -52,6 +52,9 @@ let OrdersService = exports.OrdersService = class OrdersService {
         this.productsService = productsService;
     }
     async create(createOrderDto, account) {
+        if (!account && !createOrderDto.userId) {
+            throw new errors_exception_1.BadRequestError('Không thể tạo đơn hàng khi không có thông tin về KH');
+        }
         const { items } = createOrderDto;
         const orderId = new mongoose_2.default.Types.ObjectId();
         const orderCode = (0, utils_1.generateOrderCode)();
@@ -68,7 +71,7 @@ let OrdersService = exports.OrdersService = class OrdersService {
                     ...createOrderDto,
                     _id: orderId,
                     code: orderCode,
-                    account: account._id
+                    user: account ? account._id : createOrderDto.userId
                 }
             ], { session });
             await session.commitTransaction();

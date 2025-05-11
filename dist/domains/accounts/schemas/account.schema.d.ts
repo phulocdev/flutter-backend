@@ -5,6 +5,7 @@ export declare class Account {
     email: string;
     password: string;
     fullName: string;
+    isGuest: boolean;
     avatarUrl: string;
     address: string;
     role: Role;

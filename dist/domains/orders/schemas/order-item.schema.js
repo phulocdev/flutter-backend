@@ -52,7 +52,11 @@ __decorate([
 __decorate([
     (0, mongoose_1.Prop)({ required: true, type: Number }),
     __metadata("design:type", Number)
-], OrderItem.prototype, "price", void 0);
+], OrderItem.prototype, "sellingPrice", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: true, type: Number }),
+    __metadata("design:type", Number)
+], OrderItem.prototype, "costPrice", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ type: Date, default: Date.now }),
     __metadata("design:type", String)

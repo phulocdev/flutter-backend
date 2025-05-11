@@ -3,6 +3,7 @@ import { OrderItemDto } from 'domains/orders/dto/order-item.dto';
 import { ShippingInfoDto } from 'domains/orders/dto/shipping-info.dto';
 export declare class CreateOrderDto {
     items: OrderItemDto[];
+    userId?: string;
     totalPrice: number;
     paymentMethod: PaymentMethod;
     shippingInfo: ShippingInfoDto;
