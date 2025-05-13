@@ -39,7 +39,7 @@ export class SkuDto {
     each: true,
     message: `Mỗi phần tử trong skus[index].attributeValues phải là dạng chuỗi`
   })
-  @MaxLength(20, { each: true, message: 'Không được vượt quá 20 ký tự' })
+  @MaxLength(100, { each: true, message: 'Không được vượt quá 100 ký tự' })
   @MinLength(1, { each: true, message: 'Từng attribute phải có ít nhất 1 ký tự' })
   @IsArray({ message: 'skus[index].attributeValues phải là định dạng mảng' })
   @IsNotEmpty({ message: 'skus[index].attributeValues không được bỏ trống' }) // Trong trường hợp tạo sản phẩm không có Varians (SKUS) thì sẽ có attributeValues là 1 array rỗng

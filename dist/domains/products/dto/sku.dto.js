@@ -43,7 +43,7 @@ __decorate([
         each: true,
         message: `Mỗi phần tử trong skus[index].attributeValues phải là dạng chuỗi`
     }),
-    (0, class_validator_1.MaxLength)(20, { each: true, message: 'Không được vượt quá 20 ký tự' }),
+    (0, class_validator_1.MaxLength)(100, { each: true, message: 'Không được vượt quá 100 ký tự' }),
     (0, class_validator_1.MinLength)(1, { each: true, message: 'Từng attribute phải có ít nhất 1 ký tự' }),
     (0, class_validator_1.IsArray)({ message: 'skus[index].attributeValues phải là định dạng mảng' }),
     (0, class_validator_1.IsNotEmpty)({ message: 'skus[index].attributeValues không được bỏ trống' }),
