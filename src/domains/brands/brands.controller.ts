@@ -8,6 +8,7 @@ import { DateRangeQueryDto } from 'core/query-string-dtos/date-range-query.dto'
 import { BrandQueryDto } from 'domains/brands/dto/brand-query-dto'
 import { ValidateDateRange } from 'core/pipes/validate-date-range.pipe'
 import { ValidateMongoIdPipe } from 'core/pipes/validate-mongo-id.pipe'
+import { Public } from 'core/decorators/public.decorator'
 
 @Controller('brands')
 export class BrandsController {
@@ -19,6 +20,7 @@ export class BrandsController {
     return this.brandsService.create(createBrandDto)
   }
 
+  @Public()
   @Get()
   @ResponseMessage('Lấy danh sách thương hiệu thành công')
   findAll(

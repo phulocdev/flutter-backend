@@ -3,8 +3,8 @@ export declare class ProductQueryDto {
     sort?: string;
     code?: string;
     name?: string;
-    categoryId?: string;
-    brandId?: string;
+    categoryIds?: string[];
+    brandIds?: string[];
     status?: ProductStatus;
     minPrice?: number;
     maxPrice?: number;

@@ -23,6 +23,7 @@ const pagination_query_dto_1 = require("../../core/query-string-dtos/pagination-
 const date_range_query_dto_1 = require("../../core/query-string-dtos/date-range-query.dto");
 const validate_date_range_pipe_1 = require("../../core/pipes/validate-date-range.pipe");
 const category_query_dto_1 = require("./dto/category-query-dto");
+const public_decorator_1 = require("../../core/decorators/public.decorator");
 let CategoriesController = exports.CategoriesController = class CategoriesController {
     constructor(categoriesService) {
         this.categoriesService = categoriesService;
@@ -54,6 +55,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], CategoriesController.prototype, "create", null);
 __decorate([
+    (0, public_decorator_1.Public)(),
     (0, common_1.Get)(),
     (0, response_message_decorator_1.ResponseMessage)('Fetch danh sách danh mục thành công'),
     __param(0, (0, common_1.Query)()),

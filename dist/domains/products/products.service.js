@@ -121,13 +121,22 @@ let ProductsService = exports.ProductsService = class ProductsService {
         }
     }
     async findAll(qs) {
-        const { page, limit, from, to, sort: sortQuery, name, brandId, categoryId, code, maxPrice, minPrice, status } = qs;
+        const { page, limit, from, to, sort: sortQuery, name, brandIds, categoryIds, code, maxPrice, minPrice, status } = qs;
         const filter = {};
         if (name) {
             filter.name = { $regex: name, $options: 'i' };
         }
         if (code) {
             filter.code = { $regex: code, $options: 'i' };
+        }
+        if (categoryIds) {
+            filter.category = { $in: categoryIds };
+        }
+        if (brandIds) {
+            filter.brand = { $in: brandIds };
+        }
+        if (minPrice !== undefined && maxPrice) {
+            filter.basePrice = { $gte: minPrice, $lte: maxPrice };
         }
         let sort = { createdAt: -1 };
         if (sortQuery) {

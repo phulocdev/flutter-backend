@@ -1,6 +1,19 @@
 import { Transform, Type } from 'class-transformer'
-import { IsEnum, IsMongoId, IsNumber, IsOptional, IsString, MinLength, Min, Max } from 'class-validator'
+import {
+  IsEnum,
+  IsMongoId,
+  IsNumber,
+  IsOptional,
+  IsString,
+  MinLength,
+  Min,
+  Max,
+  ArrayMinSize,
+  IsArray,
+  IsNotEmpty
+} from 'class-validator'
 import { ProductStatus } from 'core/constants/enum'
+import { IsUniqueArray } from 'core/decorators/is-unique-array.decorator'
 
 export class ProductQueryDto {
   @MinLength(5, { message: 'sort phải có ít nhất 5 ký tự' })
@@ -21,13 +34,25 @@ export class ProductQueryDto {
   @IsOptional()
   name?: string
 
-  @IsMongoId({ message: 'categoryId phải là ObjectId hợp lệ' })
+  @IsUniqueArray('Các phần tử trong categoryIds không được trùng lặp')
+  @IsMongoId({
+    each: true,
+    message: `Các phần tử trong categoryIds phải là ObjectId`
+  })
+  @ArrayMinSize(1, { message: 'categoryIds phải có ít một phần tử' })
+  @Transform(({ value }: { value: string }) => value.split(',').filter((v) => !!v && v.trim().length > 0))
   @IsOptional()
-  categoryId?: string
+  categoryIds?: string[]
 
-  @IsMongoId({ message: 'brandId phải là ObjectId hợp lệ' })
+  @IsUniqueArray('Các phần tử trong brandIds không được trùng lặp')
+  @IsMongoId({
+    each: true,
+    message: `Các phần tử trong brandIds phải là ObjectId`
+  })
+  @ArrayMinSize(1, { message: 'brandIds phải có ít một phần tử' })
+  @Transform(({ value }: { value: string }) => value.split(',').filter((v) => !!v && v.trim().length > 0))
   @IsOptional()
-  brandId?: string
+  brandIds?: string[]
 
   @IsEnum(ProductStatus, {
     message: `status phải là một trong các giá trị sau: ${Object.values(ProductStatus).join(' || ')}`

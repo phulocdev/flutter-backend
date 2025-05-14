@@ -122,7 +122,7 @@ export class ProductsService {
   }
 
   async findAll(qs: PaginationQueryDto & DateRangeQueryDto & ProductQueryDto) {
-    const { page, limit, from, to, sort: sortQuery, name, brandId, categoryId, code, maxPrice, minPrice, status } = qs
+    const { page, limit, from, to, sort: sortQuery, name, brandIds, categoryIds, code, maxPrice, minPrice, status } = qs
     // sort và status là những query có gtri đặc biệt -> phải transform thành cú pháp hợp lệ trước khi mà thực hiện filter
     // customerCode và tableNumber là query đặc biệt -> dùng để query nested Object
     // Cho nên ta phải tasck 3 query value đó ra riêng
@@ -146,10 +146,19 @@ export class ProductsService {
       filter.code = { $regex: code, $options: 'i' }
     }
 
-    // if (tableNumber) {
-    //   filter.tableNumber = { $in: tableNumber }
-    // }
+    if (categoryIds) {
+      filter.category = { $in: categoryIds }
+    }
 
+    if (brandIds) {
+      filter.brand = { $in: brandIds }
+    }
+
+    if (minPrice !== undefined && maxPrice) {
+      filter.basePrice = { $gte: minPrice, $lte: maxPrice }
+    }
+
+    // sort: createdAt.desc || createdAt.asc
     let sort: Record<string, 1 | -1> = { createdAt: -1 }
     if (sortQuery) {
       const sortField = sortQuery.split('.')[0]

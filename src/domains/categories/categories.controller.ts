@@ -8,6 +8,7 @@ import { PaginationQueryDto } from 'core/query-string-dtos/pagination-query.dto'
 import { DateRangeQueryDto } from 'core/query-string-dtos/date-range-query.dto'
 import { ValidateDateRange } from 'core/pipes/validate-date-range.pipe'
 import { CategoryQueryDto } from 'domains/categories/dto/category-query-dto'
+import { Public } from 'core/decorators/public.decorator'
 
 @Controller('categories')
 export class CategoriesController {
@@ -18,6 +19,7 @@ export class CategoriesController {
     return this.categoriesService.create(createCategoryDto)
   }
 
+  @Public()
   @Get()
   @ResponseMessage('Fetch danh sách danh mục thành công')
   findAll(

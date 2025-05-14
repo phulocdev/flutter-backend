@@ -13,6 +13,7 @@ exports.ProductQueryDto = void 0;
 const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
 const enum_1 = require("../../../core/constants/enum");
+const is_unique_array_decorator_1 = require("../../../core/decorators/is-unique-array.decorator");
 class ProductQueryDto {
 }
 exports.ProductQueryDto = ProductQueryDto;
@@ -38,15 +39,27 @@ __decorate([
     __metadata("design:type", String)
 ], ProductQueryDto.prototype, "name", void 0);
 __decorate([
-    (0, class_validator_1.IsMongoId)({ message: 'categoryId phải là ObjectId hợp lệ' }),
+    (0, is_unique_array_decorator_1.IsUniqueArray)('Các phần tử trong categoryIds không được trùng lặp'),
+    (0, class_validator_1.IsMongoId)({
+        each: true,
+        message: `Các phần tử trong categoryIds phải là ObjectId`
+    }),
+    (0, class_validator_1.ArrayMinSize)(1, { message: 'categoryIds phải có ít một phần tử' }),
+    (0, class_transformer_1.Transform)(({ value }) => value.split(',').filter((v) => !!v && v.trim().length > 0)),
     (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", String)
-], ProductQueryDto.prototype, "categoryId", void 0);
+    __metadata("design:type", Array)
+], ProductQueryDto.prototype, "categoryIds", void 0);
 __decorate([
-    (0, class_validator_1.IsMongoId)({ message: 'brandId phải là ObjectId hợp lệ' }),
+    (0, is_unique_array_decorator_1.IsUniqueArray)('Các phần tử trong brandIds không được trùng lặp'),
+    (0, class_validator_1.IsMongoId)({
+        each: true,
+        message: `Các phần tử trong brandIds phải là ObjectId`
+    }),
+    (0, class_validator_1.ArrayMinSize)(1, { message: 'brandIds phải có ít một phần tử' }),
+    (0, class_transformer_1.Transform)(({ value }) => value.split(',').filter((v) => !!v && v.trim().length > 0)),
     (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", String)
-], ProductQueryDto.prototype, "brandId", void 0);
+    __metadata("design:type", Array)
+], ProductQueryDto.prototype, "brandIds", void 0);
 __decorate([
     (0, class_validator_1.IsEnum)(enum_1.ProductStatus, {
         message: `status phải là một trong các giá trị sau: ${Object.values(enum_1.ProductStatus).join(' || ')}`
