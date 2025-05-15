@@ -200,11 +200,19 @@ export class ProductsService {
       .populate([{ path: 'category' }, { path: 'brand' }])
       .lean(true)
 
-    const skuDocumentList = await this.skuModel.find({ product: productId })
+    const [skuDocumentList, productVariants] = await Promise.all([
+      this.skuModel.find({ product: productId }),
+      this.productAttributeModel.findOne({ product: productId })
+    ])
     const skuIds = skuDocumentList.map((sku) => sku._id)
+    const hasVariants = productVariants !== null
 
-    // TH: SP chỉ có 1 biến thể duy nhất (SP không có biến thể)
-    if (skuIds.length === 1) {
+    // TH: SP chỉ có 1 biến thể duy nhất
+    // -> Thuộc 2 trường hợp là sản phẩm không có biến thể (thật sự)
+    //                          sản phẩm chỉ có 1 biến thể
+
+    // Chon nên là điều kiện ngay bên dưởi chỉ nên match trong trường hợp sản phẩm KHÔNG có biến thể
+    if (skuIds.length === 1 && !hasVariants) {
       const [baseProduct] = await Promise.all([baseProductPromise])
 
       return {

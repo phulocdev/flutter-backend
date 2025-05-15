@@ -174,9 +174,13 @@ let ProductsService = exports.ProductsService = class ProductsService {
             .findById(productId)
             .populate([{ path: 'category' }, { path: 'brand' }])
             .lean(true);
-        const skuDocumentList = await this.skuModel.find({ product: productId });
+        const [skuDocumentList, productVariants] = await Promise.all([
+            this.skuModel.find({ product: productId }),
+            this.productAttributeModel.findOne({ product: productId })
+        ]);
         const skuIds = skuDocumentList.map((sku) => sku._id);
-        if (skuIds.length === 1) {
+        const hasVariants = productVariants !== null;
+        if (skuIds.length === 1 && !hasVariants) {
             const [baseProduct] = await Promise.all([baseProductPromise]);
             return {
                 ...baseProduct,
