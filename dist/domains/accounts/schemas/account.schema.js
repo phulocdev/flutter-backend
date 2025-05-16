@@ -27,9 +27,17 @@ __decorate([
     __metadata("design:type", String)
 ], Account.prototype, "fullName", void 0);
 __decorate([
+    (0, mongoose_1.Prop)({ required: false, default: '', type: String, unique: true }),
+    __metadata("design:type", String)
+], Account.prototype, "phoneNumber", void 0);
+__decorate([
     (0, mongoose_1.Prop)({ required: false, type: Boolean, default: false }),
     __metadata("design:type", Boolean)
 ], Account.prototype, "isGuest", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: false, type: Boolean, default: true }),
+    __metadata("design:type", Boolean)
+], Account.prototype, "isActive", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ required: false, type: String, default: '' }),
     __metadata("design:type", String)

@@ -40,11 +40,23 @@ __decorate([
 __decorate([
     (0, class_validator_1.MaxLength)(40, { message: 'address không được vượt quá 40 kí tự' }),
     (0, class_validator_1.IsString)({ message: 'address phải là kiểu dữ liệu là string' }),
-    (0, class_validator_1.MinLength)(8, { message: 'address phải có ít nhất 8 kí tự' }),
-    (0, class_validator_1.IsNotEmpty)({ message: 'address không được bỏ trống' }),
+    (0, class_validator_1.MinLength)(1, { message: 'address phải có ít nhất 1 kí tự' }),
     (0, class_transformer_1.Transform)(({ value }) => String(value).trim()),
+    (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateAccountDto.prototype, "address", void 0);
+__decorate([
+    (0, class_validator_1.IsBoolean)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Boolean)
+], CreateAccountDto.prototype, "isActive", void 0);
+__decorate([
+    (0, class_validator_1.Matches)(/(84|0[3|5|7|8|9])+([0-9]{8})\b/g, { message: 'phoneNumber không đúng định dạng' }),
+    (0, class_validator_1.IsString)({ message: 'phoneNumber phải là kiểu dữ liệu là string' }),
+    (0, class_transformer_1.Transform)(({ value }) => String(value).trim()),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateAccountDto.prototype, "phoneNumber", void 0);
 __decorate([
     (0, class_validator_1.IsString)({ message: 'imageUrl phải là kiểu dữ liệu là string' }),
     (0, class_validator_1.IsOptional)(),

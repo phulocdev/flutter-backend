@@ -79,14 +79,15 @@ let AccountsService = exports.AccountsService = class AccountsService {
     }
     async findAll(qs) {
         const { page, limit, sort: sortQuery, ...filter } = qs;
-        const sortField = sortQuery?.split('.')?.[0];
-        const sort = sortQuery?.split('.')?.[1] === 'desc' ? `-${sortField}` : sortField;
-        const query = this.accountModel.find(filter);
+        let sort = { createdAt: -1 };
+        if (sortQuery) {
+            const sortField = sortQuery.split('.')[0];
+            const isDescending = sortQuery.split('.')[1] === 'desc';
+            sort = isDescending ? { [sortField]: -1 } : { [sortField]: 1 };
+        }
+        const query = this.accountModel.find(filter).sort(sort);
         if (limit && page) {
-            query
-                .skip((page - 1) * limit)
-                .limit(limit)
-                .sort(sort);
+            query.skip((page - 1) * limit).limit(limit);
         }
         const [data, totalDocuments] = await Promise.all([query, this.accountModel.countDocuments(filter)]);
         return {

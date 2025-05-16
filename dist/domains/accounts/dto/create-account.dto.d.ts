@@ -3,7 +3,9 @@ export declare class CreateAccountDto {
     email: string;
     password: string;
     fullName: string;
-    address: string;
+    address?: string;
+    isActive?: boolean;
+    phoneNumber?: string;
     avatarUrl?: string;
     role?: Role;
 }

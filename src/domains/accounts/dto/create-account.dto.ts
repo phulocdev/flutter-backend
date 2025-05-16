@@ -1,5 +1,15 @@
 import { Transform } from 'class-transformer'
-import { IsBoolean, IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from 'class-validator'
+import {
+  IsBoolean,
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Matches,
+  MaxLength,
+  MinLength
+} from 'class-validator'
 import { Role } from 'core/constants/enum'
 
 export class CreateAccountDto {
@@ -23,10 +33,20 @@ export class CreateAccountDto {
 
   @MaxLength(40, { message: 'address không được vượt quá 40 kí tự' })
   @IsString({ message: 'address phải là kiểu dữ liệu là string' })
-  @MinLength(8, { message: 'address phải có ít nhất 8 kí tự' })
-  @IsNotEmpty({ message: 'address không được bỏ trống' })
+  @MinLength(1, { message: 'address phải có ít nhất 1 kí tự' })
   @Transform(({ value }) => String(value).trim())
-  address: string
+  @IsOptional()
+  address?: string
+
+  @IsBoolean()
+  @IsOptional()
+  isActive?: boolean
+
+  @Matches(/(84|0[3|5|7|8|9])+([0-9]{8})\b/g, { message: 'phoneNumber không đúng định dạng' })
+  @IsString({ message: 'phoneNumber phải là kiểu dữ liệu là string' })
+  @Transform(({ value }) => String(value).trim())
+  @IsOptional()
+  phoneNumber?: string
 
   @IsString({ message: 'imageUrl phải là kiểu dữ liệu là string' })
   @IsOptional() // Tác dụng khi gọi API

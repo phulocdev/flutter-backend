@@ -39,7 +39,9 @@ export declare class AuthService {
         }>;
         email: string;
         fullName: string;
+        phoneNumber: string;
         isGuest: boolean;
+        isActive: boolean;
         avatarUrl: string;
         address: string;
         role: Role;

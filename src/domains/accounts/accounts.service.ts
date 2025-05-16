@@ -53,16 +53,25 @@ export class AccountsService {
 
   async findAll(qs: PaginationQueryDto & AccountQueryDto) {
     const { page, limit, sort: sortQuery, ...filter } = qs
-    const sortField = sortQuery?.split('.')?.[0]
-    const sort = sortQuery?.split('.')?.[1] === 'desc' ? `-${sortField}` : sortField
 
-    const query = this.accountModel.find(filter)
+    // sort: createdAt.desc || createdAt.asc
+    let sort: Record<string, 1 | -1> = { createdAt: -1 }
+    if (sortQuery) {
+      const sortField = sortQuery.split('.')[0]
+      const isDescending = sortQuery.split('.')[1] === 'desc'
+      sort = isDescending ? { [sortField]: -1 } : { [sortField]: 1 }
+    }
+
+    // if (from || to) {
+    //   filter.createdAt = {}
+    //   if (from) filter.createdAt.$gte = from
+    //   if (to) filter.createdAt.$lt = to
+    // }
+
+    const query = this.accountModel.find(filter).sort(sort)
 
     if (limit && page) {
-      query
-        .skip((page - 1) * limit)
-        .limit(limit)
-        .sort(sort)
+      query.skip((page - 1) * limit).limit(limit)
     }
 
     const [data, totalDocuments] = await Promise.all([query, this.accountModel.countDocuments(filter)])
