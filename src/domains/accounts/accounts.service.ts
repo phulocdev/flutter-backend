@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import * as bcrypt from 'bcrypt'
-import { NotFoundError, UnprocessableEntityError } from 'core/exceptions/errors.exception'
+import { BadRequestError, NotFoundError, UnprocessableEntityError } from 'core/exceptions/errors.exception'
 import { PaginationQueryDto } from 'core/query-string-dtos/pagination-query.dto'
 import { AccountQueryDto } from 'domains/accounts/dto/account-query.dto'
 import { Account, AccountDocument } from 'domains/accounts/schemas/account.schema'
@@ -30,12 +30,22 @@ export class AccountsService {
       avatarUrl: newGuestAccount.avatarUrl,
       email: newGuestAccount.email,
       fullName: newGuestAccount.fullName,
-      role: newGuestAccount.role
+      role: newGuestAccount.role,
+      address: newGuestAccount.address,
+      phoneNumber: newGuestAccount.phoneNumber
     }
   }
 
-  async create(createAccountDto: CreateAccountDto & { _id?: string }) {
-    const hashedPassword = await this.hashPassword(createAccountDto.password)
+  async create(createAccountDto: CreateAccountDto & { _id?: string }): Promise<AccountType> {
+    const [accountWithEmail, hashedPassword] = await Promise.all([
+      this.accountModel.findOne({ email: createAccountDto.email }),
+      this.hashPassword(createAccountDto.password)
+    ])
+
+    if (accountWithEmail) {
+      throw new BadRequestError('Email này đã tồn tại trên hệ thống')
+    }
+
     const newAccount = await this.accountModel.create({
       ...createAccountDto,
       password: hashedPassword,
@@ -47,7 +57,9 @@ export class AccountsService {
       email: newAccount.email,
       fullName: newAccount.fullName,
       avatarUrl: newAccount.avatarUrl,
-      role: newAccount.role
+      role: newAccount.role,
+      address: newAccount.address,
+      phoneNumber: newAccount.phoneNumber
     }
   }
 
@@ -113,7 +125,23 @@ export class AccountsService {
   }
 
   async update(id: string, updateAccountDto: UpdateAccountDto) {
+    const { isChangeEmail, isChangePhoneNumber, email, phoneNumber } = updateAccountDto
     const account = await this.accountModel.findOne({ _id: id })
+
+    if (isChangePhoneNumber) {
+      const isExistAccountWithPhoneNumber = (await this.accountModel.findOne({ phoneNumber })) !== null
+      if (isExistAccountWithPhoneNumber) {
+        throw new BadRequestError('Số điện thoại này đã tồn tại')
+      }
+    }
+
+    if (isChangeEmail) {
+      const isExistAccountWithEmail = (await this.accountModel.findOne({ email })) !== null
+      if (isExistAccountWithEmail) {
+        throw new BadRequestError('Email này đã tồn tại')
+      }
+    }
+
     if (!account) {
       throw new NotFoundError('Tài khoản không tồn tại')
     }
@@ -134,7 +162,9 @@ export class AccountsService {
       avatarUrl: updatedAccount.avatarUrl,
       email: updatedAccount.email,
       fullName: updatedAccount.fullName,
-      role: updatedAccount.role
+      role: updatedAccount.role,
+      address: updatedAccount.address,
+      phoneNumber: updatedAccount.phoneNumber
     }
   }
 

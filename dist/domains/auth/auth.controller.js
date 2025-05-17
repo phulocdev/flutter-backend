@@ -20,12 +20,13 @@ const response_message_decorator_1 = require("../../core/decorators/response-mes
 const local_auth_guard_1 = require("../../core/guards/local-auth.guard");
 const auth_service_1 = require("./auth.service");
 const change_password_dto_1 = require("./dtos/change-password.dto");
-const forgot_password_dto_1 = require("./dtos/forgot-password.dto");
+const reset_password_dto_1 = require("./dtos/reset-password.dto");
 const login_dto_1 = require("./dtos/login.dto");
 const logout_dto_1 = require("./dtos/logout.dto");
 const refresh_token_dto_1 = require("./dtos/refresh-token.dto");
 const register_account_guest_dto_1 = require("./dtos/register-account-guest.dto");
 const register_account_dto_1 = require("./dtos/register-account.dto");
+const forgot_password_dto_1 = require("./dtos/forgot-password.dto");
 let AuthController = exports.AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
@@ -42,14 +43,17 @@ let AuthController = exports.AuthController = class AuthController {
     refreshToken(refreshTokenDto) {
         return this.authService.refreshToken(refreshTokenDto);
     }
-    forgotPassword(forgotPasswordtDto) {
-        return this.authService.forgotPassword(forgotPasswordtDto);
+    async resetUserPassword(body) {
+        return this.authService.resetPassword(body);
     }
     changePassword(changePasswordDto, account) {
         return this.authService.changePassword(changePasswordDto, account);
     }
     logout(logoutDto) {
         return this.authService.logout(logoutDto);
+    }
+    async forgotPassword(forgotPasswordDto) {
+        return this.authService.handleSendOtp(forgotPasswordDto.email);
     }
 };
 __decorate([
@@ -92,13 +96,13 @@ __decorate([
 ], AuthController.prototype, "refreshToken", null);
 __decorate([
     (0, public_decorator_1.Public)(),
-    (0, common_1.Patch)('forgot-password'),
-    (0, response_message_decorator_1.ResponseMessage)('Yêu cầu đặt lại mật khẩu đã được gửi'),
+    (0, common_1.Post)('reset-password'),
+    (0, response_message_decorator_1.ResponseMessage)('Đặt lại mật khẩu thành công'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [forgot_password_dto_1.ForgotPasswordtDto]),
-    __metadata("design:returntype", void 0)
-], AuthController.prototype, "forgotPassword", null);
+    __metadata("design:paramtypes", [reset_password_dto_1.ResetPasswordDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "resetUserPassword", null);
 __decorate([
     (0, common_1.Patch)('change-password'),
     (0, response_message_decorator_1.ResponseMessage)('Mật khẩu đã được thay đổi thành công'),
@@ -116,6 +120,15 @@ __decorate([
     __metadata("design:paramtypes", [logout_dto_1.LogoutDto]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "logout", null);
+__decorate([
+    (0, public_decorator_1.Public)(),
+    (0, common_1.Post)('forgot-password'),
+    (0, response_message_decorator_1.ResponseMessage)('Gửi mã OTP thành công'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [forgot_password_dto_1.ForgotPasswordDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "forgotPassword", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])

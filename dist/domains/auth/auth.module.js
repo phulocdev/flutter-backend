@@ -13,15 +13,17 @@ const passport_1 = require("@nestjs/passport");
 const accounts_module_1 = require("../accounts/accounts.module");
 const jwt_strategy_1 = require("./jwt.strategy");
 const local_strategy_1 = require("./local.strategy");
+const mail_service_1 = require("../mail/mail.service");
+const otps_module_1 = require("../otps/otps.module");
 const auth_controller_1 = require("./auth.controller");
 const auth_service_1 = require("./auth.service");
 let AuthModule = exports.AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
-        imports: [passport_1.PassportModule, accounts_module_1.AccountsModule],
+        imports: [passport_1.PassportModule, accounts_module_1.AccountsModule, otps_module_1.OtpsModule],
         controllers: [auth_controller_1.AuthController],
-        providers: [auth_service_1.AuthService, local_strategy_1.LocalEmployeeStrategy, jwt_strategy_1.JwtStrategy, jwt_1.JwtService]
+        providers: [auth_service_1.AuthService, local_strategy_1.LocalEmployeeStrategy, jwt_strategy_1.JwtStrategy, jwt_1.JwtService, mail_service_1.MailService]
     })
 ], AuthModule);
 //# sourceMappingURL=auth.module.js.map

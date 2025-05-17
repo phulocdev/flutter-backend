@@ -9,6 +9,7 @@ import { UnprocessableEntityError } from 'core/exceptions/errors.exception'
 import { JwtAuthGuard } from 'core/guards/jwt-auth.guard'
 import { TransformResponseInterceptor } from 'core/interceptors/transform-response.interceptor'
 import { extractErrorMessageFromDto } from 'core/utils/utils'
+import { OtpsModule } from 'domains/otps/otps.module'
 import Joi from 'joi'
 
 @Module({

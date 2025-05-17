@@ -19,13 +19,17 @@ const jwt_1 = require("@nestjs/jwt");
 const enum_1 = require("../../core/constants/enum");
 const errors_exception_1 = require("../../core/exceptions/errors.exception");
 const accounts_service_1 = require("../accounts/accounts.service");
+const mail_service_1 = require("../mail/mail.service");
+const otps_service_1 = require("../otps/otps.service");
 const mongoose_1 = __importDefault(require("mongoose"));
 const ms_1 = __importDefault(require("ms"));
 let AuthService = exports.AuthService = class AuthService {
-    constructor(accountsService, jwtService, configService) {
+    constructor(accountsService, jwtService, configService, mailService, otpService) {
         this.accountsService = accountsService;
         this.jwtService = jwtService;
         this.configService = configService;
+        this.mailService = mailService;
+        this.otpService = otpService;
     }
     async validateAccount(email, password) {
         const account = await this.accountsService.findAccountByEmailAndPassword({ email, password });
@@ -58,7 +62,9 @@ let AuthService = exports.AuthService = class AuthService {
             avatarUrl: existingAccount.avatarUrl,
             email: existingAccount.email,
             fullName: existingAccount.fullName,
-            role: existingAccount.role
+            role: existingAccount.role,
+            address: existingAccount.address,
+            phoneNumber: existingAccount.phoneNumber
         };
     }
     async register(registerAccountDto) {
@@ -81,14 +87,18 @@ let AuthService = exports.AuthService = class AuthService {
                 email,
                 fullName,
                 role: enum_1.Role.Customer,
-                avatarUrl: ''
+                avatarUrl: '',
+                address: account.address,
+                phoneNumber: account.phoneNumber
             }),
             this.signRefreshToken({
                 _id: accountId,
                 email,
                 fullName,
                 role: enum_1.Role.Customer,
-                avatarUrl: ''
+                avatarUrl: '',
+                address: account.address,
+                phoneNumber: account.phoneNumber
             })
         ]);
         this.accountsService.updateRefreshToken(accountId, refreshToken);
@@ -131,13 +141,18 @@ let AuthService = exports.AuthService = class AuthService {
             throw error;
         }
     }
-    async forgotPassword(forgotPasswordDto) {
-        const { email, password } = forgotPasswordDto;
-        const account = await this.accountsService.findByEmail(email);
-        if (!account) {
-            throw new errors_exception_1.NotFoundError('Email không tồn tại trên hệ thống');
+    async resetPassword(resetPasswordDto) {
+        const { email, otpCode, password } = resetPasswordDto;
+        const otpDocument = await this.otpService.findOtpCodeByUserEmail(email);
+        if (!otpDocument) {
+            throw new errors_exception_1.BadRequestError('Mã OTP không còn hiệu lực');
         }
-        return this.accountsService.updatePassword(account._id.toString(), password);
+        const { otp: userOtp } = otpDocument;
+        if (userOtp !== Number(otpCode)) {
+            throw new errors_exception_1.BadRequestError('Mã OTP không chính xác');
+        }
+        await this.accountsService.updatePassword(email, password);
+        await this.otpService.removeOtpByEmail(email);
     }
     async changePassword(changePasswordDto, account) {
         const { oldPassword, newPassword } = changePasswordDto;
@@ -160,9 +175,13 @@ let AuthService = exports.AuthService = class AuthService {
             accessToken,
             refreshToken,
             account: {
+                _id: account._id,
+                avatarUrl: account.avatarUrl,
                 email: account.email,
                 fullName: account.fullName,
-                role: account.role
+                role: account.role,
+                address: account.address,
+                phoneNumber: account.phoneNumber
             }
         };
     }
@@ -206,11 +225,22 @@ let AuthService = exports.AuthService = class AuthService {
             return this.accountsService.findOne(payload._id);
         }
     }
+    async handleSendOtp(email) {
+        const existAccount = await this.accountsService.findByEmail(email);
+        if (!existAccount) {
+            throw new errors_exception_1.UnprocessableEntityError([{ field: 'email', message: 'Email không tồn tại trên hệ thống' }]);
+        }
+        const otpCode = Math.trunc(Math.random() * 1000000);
+        await this.mailService.sendOtp(email, otpCode);
+        await this.otpService.create({ otp: otpCode, email });
+    }
 };
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [accounts_service_1.AccountsService,
         jwt_1.JwtService,
-        config_1.ConfigService])
+        config_1.ConfigService,
+        mail_service_1.MailService,
+        otps_service_1.OtpsService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

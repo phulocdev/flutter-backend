@@ -11,11 +11,13 @@ import {
 import { AccountType, AuthTokenPayload } from 'core/types/type'
 import { AccountsService } from 'domains/accounts/accounts.service'
 import { ChangePasswordDto } from 'domains/auth/dtos/change-password.dto'
-import { ForgotPasswordtDto } from 'domains/auth/dtos/forgot-password.dto'
 import { LogoutDto } from 'domains/auth/dtos/logout.dto'
 import { RefreshTokenDto } from 'domains/auth/dtos/refresh-token.dto'
 import { RegisterAccountGuestDto } from 'domains/auth/dtos/register-account-guest.dto'
 import { RegisterAccountDto } from 'domains/auth/dtos/register-account.dto'
+import { ResetPasswordDto } from 'domains/auth/dtos/reset-password.dto'
+import { MailService } from 'domains/mail/mail.service'
+import { OtpsService } from 'domains/otps/otps.service'
 import mongoose from 'mongoose'
 import ms, { StringValue } from 'ms'
 
@@ -24,7 +26,9 @@ export class AuthService {
   constructor(
     private readonly accountsService: AccountsService,
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    private mailService: MailService,
+    private otpService: OtpsService
   ) {}
 
   async validateAccount(email: string, password: string) {
@@ -63,7 +67,9 @@ export class AuthService {
       avatarUrl: existingAccount.avatarUrl,
       email: existingAccount.email,
       fullName: existingAccount.fullName,
-      role: existingAccount.role
+      role: existingAccount.role,
+      address: existingAccount.address,
+      phoneNumber: existingAccount.phoneNumber
     }
   }
 
@@ -88,14 +94,18 @@ export class AuthService {
         email,
         fullName,
         role: Role.Customer,
-        avatarUrl: ''
+        avatarUrl: '',
+        address: account.address,
+        phoneNumber: account.phoneNumber
       }),
       this.signRefreshToken({
         _id: accountId,
         email,
         fullName,
         role: Role.Customer,
-        avatarUrl: ''
+        avatarUrl: '',
+        address: account.address,
+        phoneNumber: account.phoneNumber
       })
     ])
 
@@ -143,13 +153,21 @@ export class AuthService {
     }
   }
 
-  async forgotPassword(forgotPasswordDto: ForgotPasswordtDto) {
-    const { email, password } = forgotPasswordDto
-    const account = await this.accountsService.findByEmail(email)
-    if (!account) {
-      throw new NotFoundError('Email không tồn tại trên hệ thống')
+  async resetPassword(resetPasswordDto: ResetPasswordDto) {
+    const { email, otpCode, password } = resetPasswordDto
+    // Email of user is already check exist when send OTP code
+    const otpDocument = await this.otpService.findOtpCodeByUserEmail(email)
+    // OTP expire
+    if (!otpDocument) {
+      throw new BadRequestError('Mã OTP không còn hiệu lực')
     }
-    return this.accountsService.updatePassword(account._id.toString(), password)
+
+    const { otp: userOtp } = otpDocument
+    if (userOtp !== Number(otpCode)) {
+      throw new BadRequestError('Mã OTP không chính xác')
+    }
+    await this.accountsService.updatePassword(email, password)
+    await this.otpService.removeOtpByEmail(email)
   }
 
   async changePassword(changePasswordDto: ChangePasswordDto, account: AccountType) {
@@ -177,9 +195,13 @@ export class AuthService {
       accessToken,
       refreshToken,
       account: {
+        _id: account._id,
+        avatarUrl: account.avatarUrl,
         email: account.email,
         fullName: account.fullName,
-        role: account.role
+        role: account.role,
+        address: account.address,
+        phoneNumber: account.phoneNumber
       }
     }
   }
@@ -228,5 +250,17 @@ export class AuthService {
     if (payload._id) {
       return this.accountsService.findOne(payload._id)
     }
+  }
+
+  async handleSendOtp(email: string) {
+    const existAccount = await this.accountsService.findByEmail(email)
+    if (!existAccount) {
+      throw new UnprocessableEntityError([{ field: 'email', message: 'Email không tồn tại trên hệ thống' }])
+    }
+
+    const otpCode = Math.trunc(Math.random() * 1000000)
+    await this.mailService.sendOtp(email, otpCode)
+
+    await this.otpService.create({ otp: otpCode, email })
   }
 }

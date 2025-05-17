@@ -1,4 +1,3 @@
-export declare class ForgotPasswordtDto {
+export declare class ForgotPasswordDto {
     email: string;
-    password: string;
 }

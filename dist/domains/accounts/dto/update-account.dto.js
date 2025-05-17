@@ -13,7 +13,7 @@ exports.UpdateAccountDto = void 0;
 const mapped_types_1 = require("@nestjs/mapped-types");
 const create_account_dto_1 = require("./create-account.dto");
 const class_validator_1 = require("class-validator");
-class UpdateAccountDto extends (0, mapped_types_1.OmitType)((0, mapped_types_1.PartialType)(create_account_dto_1.CreateAccountDto), ['email']) {
+class UpdateAccountDto extends (0, mapped_types_1.OmitType)((0, mapped_types_1.PartialType)(create_account_dto_1.CreateAccountDto), []) {
 }
 exports.UpdateAccountDto = UpdateAccountDto;
 __decorate([
@@ -21,4 +21,14 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Boolean)
 ], UpdateAccountDto.prototype, "isGuest", void 0);
+__decorate([
+    (0, class_validator_1.IsBoolean)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Boolean)
+], UpdateAccountDto.prototype, "isChangePhoneNumber", void 0);
+__decorate([
+    (0, class_validator_1.IsBoolean)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Boolean)
+], UpdateAccountDto.prototype, "isChangeEmail", void 0);
 //# sourceMappingURL=update-account.dto.js.map

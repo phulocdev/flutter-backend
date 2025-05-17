@@ -9,23 +9,16 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ForgotPasswordtDto = void 0;
-const class_transformer_1 = require("class-transformer");
+exports.ForgotPasswordDto = void 0;
 const class_validator_1 = require("class-validator");
-class ForgotPasswordtDto {
+class ForgotPasswordDto {
 }
-exports.ForgotPasswordtDto = ForgotPasswordtDto;
+exports.ForgotPasswordDto = ForgotPasswordDto;
 __decorate([
     (0, class_validator_1.IsEmail)({}, { message: 'email không đúng định dạng' }),
-    (0, class_validator_1.IsNotEmpty)({ message: 'email không được  bỏ trống' }),
+    (0, class_validator_1.IsNotEmpty)({
+        message: 'email không được để trống'
+    }),
     __metadata("design:type", String)
-], ForgotPasswordtDto.prototype, "email", void 0);
-__decorate([
-    (0, class_validator_1.MaxLength)(40, { message: 'password không được vượt quá 40 kí tự' }),
-    (0, class_validator_1.MinLength)(6, { message: 'password phải có ít nhất 6 kí tự' }),
-    (0, class_validator_1.IsString)({ message: 'password phải là kiểu dữ liệu là string' }),
-    (0, class_validator_1.IsNotEmpty)({ message: 'password không được bỏ trống' }),
-    (0, class_transformer_1.Transform)(({ value }) => String(value).trim()),
-    __metadata("design:type", String)
-], ForgotPasswordtDto.prototype, "password", void 0);
+], ForgotPasswordDto.prototype, "email", void 0);
 //# sourceMappingURL=forgot-password.dto.js.map

@@ -36,7 +36,9 @@ let LocalEmployeeStrategy = exports.LocalEmployeeStrategy = class LocalEmployeeS
             avatarUrl: account.avatarUrl,
             email: account.email,
             fullName: account.fullName,
-            role: account.role
+            role: account.role,
+            address: account.address,
+            phoneNumber: account.phoneNumber
         };
     }
 };

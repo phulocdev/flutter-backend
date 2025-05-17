@@ -13,13 +13,7 @@ export declare class AccountsService {
     createForGuest(createGuestAccountDto: CreateGuestAccountDto): Promise<AccountType>;
     create(createAccountDto: CreateAccountDto & {
         _id?: string;
-    }): Promise<{
-        _id: mongoose.Types.ObjectId;
-        email: string;
-        fullName: string;
-        avatarUrl: string;
-        role: import("../../core/constants/enum").Role;
-    }>;
+    }): Promise<AccountType>;
     findAll(qs: PaginationQueryDto & AccountQueryDto): Promise<{
         data: (mongoose.Document<unknown, {}, mongoose.Document<unknown, {}, Account> & Account & {
             _id: mongoose.Types.ObjectId;

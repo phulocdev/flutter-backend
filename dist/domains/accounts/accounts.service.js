@@ -59,11 +59,19 @@ let AccountsService = exports.AccountsService = class AccountsService {
             avatarUrl: newGuestAccount.avatarUrl,
             email: newGuestAccount.email,
             fullName: newGuestAccount.fullName,
-            role: newGuestAccount.role
+            role: newGuestAccount.role,
+            address: newGuestAccount.address,
+            phoneNumber: newGuestAccount.phoneNumber
         };
     }
     async create(createAccountDto) {
-        const hashedPassword = await this.hashPassword(createAccountDto.password);
+        const [accountWithEmail, hashedPassword] = await Promise.all([
+            this.accountModel.findOne({ email: createAccountDto.email }),
+            this.hashPassword(createAccountDto.password)
+        ]);
+        if (accountWithEmail) {
+            throw new errors_exception_1.BadRequestError('Email này đã tồn tại trên hệ thống');
+        }
         const newAccount = await this.accountModel.create({
             ...createAccountDto,
             password: hashedPassword,
@@ -74,7 +82,9 @@ let AccountsService = exports.AccountsService = class AccountsService {
             email: newAccount.email,
             fullName: newAccount.fullName,
             avatarUrl: newAccount.avatarUrl,
-            role: newAccount.role
+            role: newAccount.role,
+            address: newAccount.address,
+            phoneNumber: newAccount.phoneNumber
         };
     }
     async findAll(qs) {
@@ -121,7 +131,20 @@ let AccountsService = exports.AccountsService = class AccountsService {
         return isMatchPassword ? account : null;
     }
     async update(id, updateAccountDto) {
+        const { isChangeEmail, isChangePhoneNumber, email, phoneNumber } = updateAccountDto;
         const account = await this.accountModel.findOne({ _id: id });
+        if (isChangePhoneNumber) {
+            const isExistAccountWithPhoneNumber = (await this.accountModel.findOne({ phoneNumber })) !== null;
+            if (isExistAccountWithPhoneNumber) {
+                throw new errors_exception_1.BadRequestError('Số điện thoại này đã tồn tại');
+            }
+        }
+        if (isChangeEmail) {
+            const isExistAccountWithEmail = (await this.accountModel.findOne({ email })) !== null;
+            if (isExistAccountWithEmail) {
+                throw new errors_exception_1.BadRequestError('Email này đã tồn tại');
+            }
+        }
         if (!account) {
             throw new errors_exception_1.NotFoundError('Tài khoản không tồn tại');
         }
@@ -135,7 +158,9 @@ let AccountsService = exports.AccountsService = class AccountsService {
             avatarUrl: updatedAccount.avatarUrl,
             email: updatedAccount.email,
             fullName: updatedAccount.fullName,
-            role: updatedAccount.role
+            role: updatedAccount.role,
+            address: updatedAccount.address,
+            phoneNumber: updatedAccount.phoneNumber
         };
     }
     async updateRefreshToken(id, refreshToken) {

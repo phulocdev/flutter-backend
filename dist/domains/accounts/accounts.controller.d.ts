@@ -32,13 +32,7 @@ import { UpdateAccountDto } from './dto/update-account.dto';
 export declare class AccountsController {
     private readonly accountsService;
     constructor(accountsService: AccountsService);
-    create(createAccountDto: CreateAccountDto): Promise<{
-        _id: import("mongoose").Types.ObjectId;
-        email: string;
-        fullName: string;
-        avatarUrl: string;
-        role: import("../../core/constants/enum").Role;
-    }>;
+    create(createAccountDto: CreateAccountDto): Promise<import("../../core/types/type").AccountType>;
     findAll(paginationQuery: PaginationQueryDto, tableQuery: AccountQueryDto): Promise<{
         data: (import("mongoose").Document<unknown, {}, import("mongoose").Document<unknown, {}, import("./schemas/account.schema").Account> & import("./schemas/account.schema").Account & {
             _id: import("mongoose").Types.ObjectId;

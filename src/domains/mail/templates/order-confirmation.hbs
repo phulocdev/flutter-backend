@@ -1,0 +1,235 @@
+<html lang='en'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>Order Confirmation Email</title>
+  </head>
+  <body
+    style='
+      font-family: Arial, sans-serif;
+      color: #4b5563;
+      font-size: 14px;
+      line-height: 1.6;
+    '
+  >
+    <table
+      role='presentation'
+      width='100%'
+      cellspacing='0'
+      cellpadding='0'
+      border='0'
+      align='center'
+      style='
+        max-width: 600px;
+        margin: auto;
+        padding: 20px;
+        background-color: #ffffff;
+      '
+    >
+      <tr>
+        <td style='padding-bottom: 20px; text-align: left'>
+          Xin chào
+          {{username}}, Chúng tôi đã nhận được đơn hàng của quý khách. Cảm ơn quý khách đã đặt hàng!
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <a
+            href='{{orderUrl}}'
+            style='
+              display: inline-block;
+              padding: 10px 20px;
+              color: #ffffff;
+              background-color: #1d4ed8;
+              text-decoration: none;
+              border-radius: 4px;
+            '
+          >Xem đơn hàng</a>
+        </td>
+      </tr>
+      <tr>
+        <td style='height: 10px'></td>
+      </tr>
+      <tr>
+        <td
+          style='
+            border-bottom: 1px solid #d1d5db;
+            padding-top: 10px;
+            padding-bottom: 10px;
+          '
+        ></td>
+      </tr>
+      <tr>
+        <td>
+          <h2 style='color: #111827; font-size: 18px'>Thông tin đơn hàng</h2>
+        </td>
+      </tr>
+      {{#each items}}
+        <tr>
+          <td>
+            <table role='presentation' width='100%' cellspacing='0' cellpadding='0' border='0'>
+              <tr>
+                <td style='width: 80%; padding-right: 10px'>
+                  <h3 style='font-size: 14px; font-weight: bold; color: #111827'>
+                    {{this.product.name}}
+                  </h3>
+                  <div style='margin-top: 5px; color: #6b7280; font-size: 12px'>
+                    x{{this.quantity}}
+                  </div>
+                </td>
+                <td
+                  style='
+                  width: 20%;
+                  font-weight: bold;
+                  color: #111827;
+                  text-align: right;
+                '
+                >
+                  {{this.product.salePrice}}VNĐ
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      {{/each}}
+      <tr>
+        <td style='height: 10px'></td>
+      </tr>
+      <tr>
+        <td
+          style='
+            border-bottom: 1px solid #d1d5db;
+            padding-top: 10px;
+            padding-bottom: 10px;
+          '
+        ></td>
+      </tr>
+      <tr>
+        <td>
+          <table role='presentation' width='100%' cellspacing='0' cellpadding='0' border='0'>
+            <tr>
+              <td style='padding: 8px 0; color: #4b5563'>
+                Tổng giá trị đơn hàng
+              </td>
+              <td style='font-weight: bold; color: #111827; text-align: right'>
+                {{totalAmount}}đ
+              </td>
+            </tr>
+            <tr>
+              <td style='padding: 8px 0; color: #4b5563'>Khuyến mãi</td>
+              <td style='font-weight: bold; color: #111827; text-align: right'>
+                {{discount}}
+              </td>
+            </tr>
+            <tr>
+              <td style='padding: 8px 0; color: #4b5563'>Phí vận chuyển</td>
+              <td style='font-weight: bold; color: #111827; text-align: right'>
+                {{shippingFee}}
+              </td>
+            </tr>
+            <tr>
+              <td
+                colspan='2'
+                style='
+                  border-top: 1px solid #d1d5db;
+                  padding-top: 10px;
+                  padding-bottom: 10px;
+                '
+              ></td>
+            </tr>
+
+            <tr>
+              <td
+                style='
+                  padding: 8px 0;
+                  font-size: 18px;
+                  font-weight: bold;
+                  color: #111827;
+                '
+              >
+                Tổng cộng
+              </td>
+              <td
+                style='
+                  font-size: 18px;
+                  font-weight: bold;
+                  color: #111827;
+                  text-align: right;
+                '
+              >
+                {{totalAmountWithShippingFee}}
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <h2
+            style='
+              margin-top: 20px;
+              font-size: 16px;
+              font-weight: bold;
+              color: #111827;
+            '
+          >
+            Thông tin khách hàng
+          </h2>
+          <table role='presentation' width='100%' cellspacing='0' cellpadding='0' border='0' style='margin-top: 10px'>
+            <tr>
+              <td style='width: 50%; padding-right: 10px'>
+                <strong>Địa chỉ giao hàng</strong>
+                <p>{{detailedAddress}}, {{ward}}</p>
+                <p>{{district}}, {{province}}</p>
+                <p>Vietnam</p>
+              </td>
+              <td style='width: 50%; padding-left: 10px'>
+                <strong>Phương thức thanh toán</strong>
+                <p>{{paymentMethod}}</p>
+
+                <strong style='padding-top: 10px;padding-bottom: 5px;'>Số điện thoại</strong>
+                <p>{{phoneNumber}}</p>
+              </td>
+            </tr>
+            <tr>
+              <td style='padding-right: 10px'>
+                <strong>Phương thức vận chuyển</strong>
+                <p>{{shippingMethod}}</p>
+              </td>
+              <td style='padding-left: 10px'>
+                <strong>Trạng thái đơn hàng</strong>
+                <p>{{orderStatus}}</p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td style='height: 20px'></td>
+      </tr>
+      <tr>
+        <td
+          style='
+            border-bottom: 1px solid #d1d5db;
+            padding-top: 10px;
+            padding-bottom: 10px;
+          '
+        ></td>
+      </tr>
+      <tr>
+        <td style='padding: 10px 0'>
+          Nếu bạn có bất cứ câu hỏi nào, đừng ngần ngại liên lạc với chúng tôi tại
+          <a
+            href='mailto:52200103@student.tdtu.edu.vn'
+            style='color: #1d4ed8; text-decoration: none'
+          >52200103@student.tdtu.edu.vn</a>
+          /
+          <a
+            href='mailto:52200084@student.tdtu.edu.vn'
+            style='color: #1d4ed8; text-decoration: none'
+          >52200084@student.tdtu.edu.vn</a>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

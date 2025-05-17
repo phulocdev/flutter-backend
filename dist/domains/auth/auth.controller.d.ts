@@ -27,12 +27,13 @@
 import { AccountType } from 'core/types/type';
 import { AuthService } from 'domains/auth/auth.service';
 import { ChangePasswordDto } from 'domains/auth/dtos/change-password.dto';
-import { ForgotPasswordtDto } from 'domains/auth/dtos/forgot-password.dto';
+import { ResetPasswordDto } from 'domains/auth/dtos/reset-password.dto';
 import { LoginDto } from 'domains/auth/dtos/login.dto';
 import { LogoutDto } from 'domains/auth/dtos/logout.dto';
 import { RefreshTokenDto } from 'domains/auth/dtos/refresh-token.dto';
 import { RegisterAccountGuestDto } from 'domains/auth/dtos/register-account-guest.dto';
 import { RegisterAccountDto } from 'domains/auth/dtos/register-account.dto';
+import { ForgotPasswordDto } from 'domains/auth/dtos/forgot-password.dto';
 export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);
@@ -56,17 +57,24 @@ export declare class AuthController {
             fullName: string;
             avatarUrl: string;
             role: import("../../core/constants/enum").Role;
+            phoneNumber: string;
+            address: string;
         };
     }>;
-    forgotPassword(forgotPasswordtDto: ForgotPasswordtDto): Promise<import("mongoose").UpdateWriteOpResult>;
+    resetUserPassword(body: ResetPasswordDto): Promise<void>;
     changePassword(changePasswordDto: ChangePasswordDto, account: AccountType): Promise<{
         accessToken: string;
         refreshToken: string;
         account: {
+            _id: string | import("mongoose").Types.ObjectId;
+            avatarUrl: string;
             email: string;
             fullName: string;
             role: import("../../core/constants/enum").Role;
+            address: string;
+            phoneNumber: string;
         };
     }>;
     logout(logoutDto: LogoutDto): Promise<void>;
+    forgotPassword(forgotPasswordDto: ForgotPasswordDto): Promise<void>;
 }

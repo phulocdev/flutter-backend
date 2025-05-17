@@ -32,7 +32,9 @@ export class LocalEmployeeStrategy extends PassportStrategy(Strategy, 'local') {
       avatarUrl: account.avatarUrl,
       email: account.email,
       fullName: account.fullName,
-      role: account.role
+      role: account.role,
+      address: account.address,
+      phoneNumber: account.phoneNumber
     }
   }
 }

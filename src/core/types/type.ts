@@ -7,6 +7,8 @@ export type AccountType = {
   fullName: string
   avatarUrl: string
   role: Role
+  phoneNumber: string
+  address: string
 }
 
 export type AuthTokenPayload = {
@@ -15,6 +17,8 @@ export type AuthTokenPayload = {
   fullName: string
   avatarUrl: string
   role: Role
+  phoneNumber: string
+  address: string
   iat: number
   exp: number
 }

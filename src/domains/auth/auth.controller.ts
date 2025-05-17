@@ -6,12 +6,13 @@ import { LocalEmployeeAuthGuard } from 'core/guards/local-auth.guard'
 import { AccountType } from 'core/types/type'
 import { AuthService } from 'domains/auth/auth.service'
 import { ChangePasswordDto } from 'domains/auth/dtos/change-password.dto'
-import { ForgotPasswordtDto } from 'domains/auth/dtos/forgot-password.dto'
+import { ResetPasswordDto } from 'domains/auth/dtos/reset-password.dto'
 import { LoginDto } from 'domains/auth/dtos/login.dto'
 import { LogoutDto } from 'domains/auth/dtos/logout.dto'
 import { RefreshTokenDto } from 'domains/auth/dtos/refresh-token.dto'
 import { RegisterAccountGuestDto } from 'domains/auth/dtos/register-account-guest.dto'
 import { RegisterAccountDto } from 'domains/auth/dtos/register-account.dto'
+import { ForgotPasswordDto } from 'domains/auth/dtos/forgot-password.dto'
 
 @Controller('auth')
 export class AuthController {
@@ -47,10 +48,10 @@ export class AuthController {
   }
 
   @Public()
-  @Patch('forgot-password')
-  @ResponseMessage('Yêu cầu đặt lại mật khẩu đã được gửi')
-  forgotPassword(@Body() forgotPasswordtDto: ForgotPasswordtDto) {
-    return this.authService.forgotPassword(forgotPasswordtDto)
+  @Post('reset-password')
+  @ResponseMessage('Đặt lại mật khẩu thành công')
+  async resetUserPassword(@Body() body: ResetPasswordDto) {
+    return this.authService.resetPassword(body)
   }
 
   @Patch('change-password')
@@ -63,5 +64,12 @@ export class AuthController {
   @ResponseMessage('Đăng xuất thành công')
   logout(@Body() logoutDto: LogoutDto) {
     return this.authService.logout(logoutDto)
+  }
+
+  @Public()
+  @Post('forgot-password')
+  @ResponseMessage('Gửi mã OTP thành công')
+  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+    return this.authService.handleSendOtp(forgotPasswordDto.email)
   }
 }

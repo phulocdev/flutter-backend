@@ -4,17 +4,21 @@ import { Role } from 'core/constants/enum';
 import { AccountType } from 'core/types/type';
 import { AccountsService } from 'domains/accounts/accounts.service';
 import { ChangePasswordDto } from 'domains/auth/dtos/change-password.dto';
-import { ForgotPasswordtDto } from 'domains/auth/dtos/forgot-password.dto';
 import { LogoutDto } from 'domains/auth/dtos/logout.dto';
 import { RefreshTokenDto } from 'domains/auth/dtos/refresh-token.dto';
 import { RegisterAccountGuestDto } from 'domains/auth/dtos/register-account-guest.dto';
 import { RegisterAccountDto } from 'domains/auth/dtos/register-account.dto';
+import { ResetPasswordDto } from 'domains/auth/dtos/reset-password.dto';
+import { MailService } from 'domains/mail/mail.service';
+import { OtpsService } from 'domains/otps/otps.service';
 import mongoose from 'mongoose';
 export declare class AuthService {
     private readonly accountsService;
     private readonly jwtService;
     private readonly configService;
-    constructor(accountsService: AccountsService, jwtService: JwtService, configService: ConfigService);
+    private mailService;
+    private otpService;
+    constructor(accountsService: AccountsService, jwtService: JwtService, configService: ConfigService, mailService: MailService, otpService: OtpsService);
     validateAccount(email: string, password: string): Promise<{
         _id: mongoose.Types.ObjectId;
         $locals: Record<string, unknown>;
@@ -68,16 +72,22 @@ export declare class AuthService {
             fullName: string;
             avatarUrl: string;
             role: Role;
+            phoneNumber: string;
+            address: string;
         };
     }>;
-    forgotPassword(forgotPasswordDto: ForgotPasswordtDto): Promise<mongoose.UpdateWriteOpResult>;
+    resetPassword(resetPasswordDto: ResetPasswordDto): Promise<void>;
     changePassword(changePasswordDto: ChangePasswordDto, account: AccountType): Promise<{
         accessToken: string;
         refreshToken: string;
         account: {
+            _id: string | mongoose.Types.ObjectId;
+            avatarUrl: string;
             email: string;
             fullName: string;
             role: Role;
+            address: string;
+            phoneNumber: string;
         };
     }>;
     logout(logoutDto: LogoutDto): Promise<void>;
@@ -94,4 +104,5 @@ export declare class AuthService {
     } & Required<{
         _id: mongoose.Types.ObjectId;
     }>>;
+    handleSendOtp(email: string): Promise<void>;
 }
