@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
+import { AccountType } from 'core/types/type'
 import { CreateOtpDto } from 'domains/otps/dto/create-otp.dto'
 import { Otp } from 'domains/otps/schemas/otp.schema'
 import { Model } from 'mongoose'
@@ -15,14 +16,14 @@ export class OtpsService {
     if (optDocument !== null) {
       return this.otpModel.updateOne({ email }, { otp })
     }
-    return this.otpModel.create(createOtpDto)
+    return this.otpModel.create({ ...createOtpDto })
   }
 
   async findOtpCodeByUserEmail(email: string) {
-    return await this.otpModel.findOne({ email })
+    return this.otpModel.findOne({ email })
   }
 
   async removeOtpByEmail(email: string) {
-    return await this.otpModel.deleteOne({ email })
+    return this.otpModel.deleteOne({ email })
   }
 }

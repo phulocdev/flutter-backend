@@ -20,8 +20,8 @@ export class OrdersController {
   @Public()
   @Post()
   @ResponseMessage('Tạo mới đơn hàng thành công')
-  create(@Body() createOrderDto: CreateOrderDto, @Account() account?: AccountType) {
-    return this.ordersService.create(createOrderDto, account)
+  create(@Body() createOrderDto: CreateOrderDto) {
+    return this.ordersService.create(createOrderDto)
   }
 
   @Get()

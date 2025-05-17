@@ -27,13 +27,13 @@ let OtpsService = exports.OtpsService = class OtpsService {
         if (optDocument !== null) {
             return this.otpModel.updateOne({ email }, { otp });
         }
-        return this.otpModel.create(createOtpDto);
+        return this.otpModel.create({ ...createOtpDto });
     }
     async findOtpCodeByUserEmail(email) {
-        return await this.otpModel.findOne({ email });
+        return this.otpModel.findOne({ email });
     }
     async removeOtpByEmail(email) {
-        return await this.otpModel.deleteOne({ email });
+        return this.otpModel.deleteOne({ email });
     }
 };
 exports.OtpsService = OtpsService = __decorate([

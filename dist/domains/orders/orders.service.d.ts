@@ -13,7 +13,7 @@ export declare class OrdersService {
     private readonly orderItemModel;
     private readonly productsService;
     constructor(orderModel: Model<Order>, orderItemModel: Model<OrderItem>, productsService: ProductsService);
-    create(createOrderDto: CreateOrderDto, account?: AccountType): Promise<mongoose.Document<unknown, {}, Order> & Order & Required<{
+    create(createOrderDto: CreateOrderDto): Promise<mongoose.Document<unknown, {}, Order> & Order & Required<{
         _id: mongoose.Types.ObjectId;
     }> & {
         __v: number;

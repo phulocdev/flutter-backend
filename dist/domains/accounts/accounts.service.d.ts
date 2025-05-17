@@ -112,6 +112,7 @@ export declare class AccountsService {
     findOneAndUpdateByEmail(email: string, updateAccountDto: UpdateAccountDto): Promise<AccountType>;
     updateRefreshToken(id: string, refreshToken: string): Promise<mongoose.UpdateWriteOpResult>;
     updatePassword(id: string, password: string): Promise<mongoose.UpdateWriteOpResult>;
+    updatePasswordByEmail(email: string, password: string): Promise<mongoose.UpdateWriteOpResult>;
     remove(id: string): Promise<mongoose.mongo.DeleteResult>;
     hashPassword(password: string): Promise<string>;
     comparePassword(password: string, hashedPassword: string): Promise<boolean>;

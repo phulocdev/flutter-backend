@@ -23,12 +23,12 @@ export class OrdersService {
     private readonly productsService: ProductsService
   ) {}
 
-  async create(createOrderDto: CreateOrderDto, account?: AccountType) {
-    if (!account && !createOrderDto.userId) {
+  async create(createOrderDto: CreateOrderDto) {
+    if (!createOrderDto.userId) {
       throw new BadRequestError('Không thể tạo đơn hàng khi không có thông tin về KH')
     }
 
-    const { items } = createOrderDto
+    const { items, userId } = createOrderDto
     const orderId = new mongoose.Types.ObjectId()
     const orderCode = generateOrderCode()
     const skusWithDecreaseQuantity: DecreaseStockOnHandDto['items'] = items.map(({ sku, quantity }) => ({
@@ -53,7 +53,7 @@ export class OrdersService {
             ...createOrderDto,
             _id: orderId,
             code: orderCode,
-            user: account ? account._id : createOrderDto.userId
+            user: userId
           }
         ],
         { session }
@@ -137,7 +137,7 @@ export class OrdersService {
   async findAllByCustomer(qs: PaginationQueryDto, account: AccountType) {
     const { page, limit } = qs
 
-    const filter: FilterQuery<Order> = { account: account._id }
+    const filter: FilterQuery<Order> = { user: account._id }
 
     const query = this.orderModel.find(filter).sort({ createdAt: -1 })
 

@@ -182,6 +182,16 @@ export class AccountsService {
     )
   }
 
+  async updatePasswordByEmail(email: string, password: string) {
+    const hashedPassword = await this.hashPassword(password)
+    return this.accountModel.updateOne(
+      { email },
+      {
+        password: hashedPassword
+      }
+    )
+  }
+
   async remove(id: string) {
     const account = await this.accountModel.findOne({ _id: id })
     if (!account) {

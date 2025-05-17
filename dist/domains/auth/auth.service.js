@@ -151,7 +151,7 @@ let AuthService = exports.AuthService = class AuthService {
         if (userOtp !== Number(otpCode)) {
             throw new errors_exception_1.BadRequestError('Mã OTP không chính xác');
         }
-        await this.accountsService.updatePassword(email, password);
+        await this.accountsService.updatePasswordByEmail(email, password);
         await this.otpService.removeOtpByEmail(email);
     }
     async changePassword(changePasswordDto, account) {

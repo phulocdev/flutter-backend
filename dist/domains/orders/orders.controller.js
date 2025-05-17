@@ -30,8 +30,8 @@ let OrdersController = exports.OrdersController = class OrdersController {
     constructor(ordersService) {
         this.ordersService = ordersService;
     }
-    create(createOrderDto, account) {
-        return this.ordersService.create(createOrderDto, account);
+    create(createOrderDto) {
+        return this.ordersService.create(createOrderDto);
     }
     findAll(paginationQuery, dateRangeQuery, orderQuery) {
         return this.ordersService.findAll({ ...paginationQuery, ...dateRangeQuery, ...orderQuery });
@@ -54,9 +54,8 @@ __decorate([
     (0, common_1.Post)(),
     (0, response_message_decorator_1.ResponseMessage)('Tạo mới đơn hàng thành công'),
     __param(0, (0, common_1.Body)()),
-    __param(1, (0, account_decorator_1.Account)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_order_dto_1.CreateOrderDto, Object]),
+    __metadata("design:paramtypes", [create_order_dto_1.CreateOrderDto]),
     __metadata("design:returntype", void 0)
 ], OrdersController.prototype, "create", null);
 __decorate([

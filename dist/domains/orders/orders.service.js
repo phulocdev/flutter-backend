@@ -51,11 +51,11 @@ let OrdersService = exports.OrdersService = class OrdersService {
         this.orderItemModel = orderItemModel;
         this.productsService = productsService;
     }
-    async create(createOrderDto, account) {
-        if (!account && !createOrderDto.userId) {
+    async create(createOrderDto) {
+        if (!createOrderDto.userId) {
             throw new errors_exception_1.BadRequestError('Không thể tạo đơn hàng khi không có thông tin về KH');
         }
-        const { items } = createOrderDto;
+        const { items, userId } = createOrderDto;
         const orderId = new mongoose_2.default.Types.ObjectId();
         const orderCode = (0, utils_1.generateOrderCode)();
         const skusWithDecreaseQuantity = items.map(({ sku, quantity }) => ({
@@ -71,7 +71,7 @@ let OrdersService = exports.OrdersService = class OrdersService {
                     ...createOrderDto,
                     _id: orderId,
                     code: orderCode,
-                    user: account ? account._id : createOrderDto.userId
+                    user: userId
                 }
             ], { session });
             await session.commitTransaction();
@@ -119,7 +119,7 @@ let OrdersService = exports.OrdersService = class OrdersService {
     }
     async findAllByCustomer(qs, account) {
         const { page, limit } = qs;
-        const filter = { account: account._id };
+        const filter = { user: account._id };
         const query = this.orderModel.find(filter).sort({ createdAt: -1 });
         if (limit && page) {
             query.skip((page - 1) * limit).limit(limit);

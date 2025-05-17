@@ -263,6 +263,7 @@ let ProductsService = exports.ProductsService = class ProductsService {
             baseProductPromise,
             attributeAndVariantsPromise.then((res) => res[0])
         ]);
+        this.productModel.updateOne({ _id: productId }, { $inc: { views: 1 } });
         return {
             ...baseProduct,
             attributeOptions,

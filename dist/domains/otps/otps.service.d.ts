@@ -29,11 +29,11 @@ import { Model } from 'mongoose';
 export declare class OtpsService {
     private otpModel;
     constructor(otpModel: Model<Otp>);
-    create(createOtpDto: CreateOtpDto): Promise<(import("mongoose").Document<unknown, {}, Otp> & Otp & {
+    create(createOtpDto: CreateOtpDto): Promise<import("mongoose").UpdateWriteOpResult | (import("mongoose").Document<unknown, {}, Otp> & Otp & {
         _id: import("mongoose").Types.ObjectId;
     } & {
         __v: number;
-    }) | import("mongoose").UpdateWriteOpResult>;
+    })>;
     findOtpCodeByUserEmail(email: string): Promise<import("mongoose").Document<unknown, {}, Otp> & Otp & {
         _id: import("mongoose").Types.ObjectId;
     } & {

@@ -35,7 +35,7 @@ import { BulkDeleteOrderDto } from 'domains/orders/dto/bulk-delete-order.dto';
 export declare class OrdersController {
     private readonly ordersService;
     constructor(ordersService: OrdersService);
-    create(createOrderDto: CreateOrderDto, account?: AccountType): Promise<import("mongoose").Document<unknown, {}, import("./schemas/order.schema").Order> & import("./schemas/order.schema").Order & Required<{
+    create(createOrderDto: CreateOrderDto): Promise<import("mongoose").Document<unknown, {}, import("./schemas/order.schema").Order> & import("./schemas/order.schema").Order & Required<{
         _id: import("mongoose").Types.ObjectId;
     }> & {
         __v: number;

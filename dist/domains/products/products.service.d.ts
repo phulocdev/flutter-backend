@@ -58,7 +58,7 @@ export declare class ProductsService {
             name: string;
             imageUrl: string;
         }>;
-        status: import("../../core/constants/enum").ProductStatus;
+        status: import("core/constants/enum").ProductStatus;
         basePrice: number;
         minStockLevel: number;
         maxStockLevel: number;
@@ -85,7 +85,7 @@ export declare class ProductsService {
             name: string;
             imageUrl: string;
         }>;
-        status: import("../../core/constants/enum").ProductStatus;
+        status: import("core/constants/enum").ProductStatus;
         basePrice: number;
         minStockLevel: number;
         maxStockLevel: number;

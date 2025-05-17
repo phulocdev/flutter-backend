@@ -14,6 +14,8 @@ import { ProductQueryDto } from 'domains/products/dto/product-query-dto'
 import { BadRequestError, NotFoundError, UnprocessableEntityError } from 'core/exceptions/errors.exception'
 import { IncreaseStockOnHandDto } from 'domains/products/dto/increase-stock-on-hand.dto'
 import { DecreaseStockOnHandDto } from 'domains/products/dto/decrease-stock-on-hand.dto'
+import { AccountType } from 'core/types/type'
+import { Role } from 'core/constants/enum'
 
 @Injectable()
 export class ProductsService {
@@ -317,6 +319,9 @@ export class ProductsService {
       baseProductPromise,
       attributeAndVariantsPromise.then((res) => res[0])
     ])
+
+    // Increase product viewsif
+    this.productModel.updateOne({ _id: productId }, { $inc: { views: 1 } })
 
     return {
       ...baseProduct,
