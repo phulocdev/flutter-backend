@@ -27,6 +27,12 @@ export class CreateOrderDto {
   @IsOptional()
   userId?: string
 
+  @Min(1, { message: 'itemCount phải >= 1' })
+  @IsNumber({ allowNaN: false }, { message: 'itemCount phải là định dạng số' })
+  @Transform(({ value }) => Number(value))
+  @IsNotEmpty({ message: 'itemCount không được bỏ trống' })
+  itemCount: number
+
   @Min(1, { message: 'totalPrice phải >= 1' })
   @IsNumber({ allowNaN: false }, { message: 'totalPrice phải là định dạng số' })
   @Transform(({ value }) => Number(value))

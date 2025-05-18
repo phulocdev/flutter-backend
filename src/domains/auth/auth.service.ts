@@ -259,8 +259,8 @@ export class AuthService {
     }
 
     const otpCode = Math.trunc(Math.random() * 1000000)
-    await this.mailService.sendOtp(email, otpCode)
+    this.mailService.sendOtp(email, otpCode)
 
-    await this.otpService.create({ otp: otpCode, email })
+    this.otpService.create({ otp: otpCode, email })
   }
 }

@@ -38,6 +38,10 @@ __decorate([
 __decorate([
     (0, mongoose_1.Prop)({ required: true, type: Number }),
     __metadata("design:type", Number)
+], Order.prototype, "itemCount", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: true, type: Number }),
+    __metadata("design:type", Number)
 ], Order.prototype, "totalPrice", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ required: false, type: Number, enum: enum_1.PaymentMethod, default: enum_1.PaymentMethod.COD }),

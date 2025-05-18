@@ -261,9 +261,9 @@ let ProductsService = exports.ProductsService = class ProductsService {
         ]);
         const [baseProduct, { attributeOptions, variants }] = await Promise.all([
             baseProductPromise,
-            attributeAndVariantsPromise.then((res) => res[0])
+            attributeAndVariantsPromise.then((res) => res[0]),
+            this.productModel.updateOne({ _id: productId }, { $inc: { views: 1 } })
         ]);
-        this.productModel.updateOne({ _id: productId }, { $inc: { views: 1 } });
         return {
             ...baseProduct,
             attributeOptions,

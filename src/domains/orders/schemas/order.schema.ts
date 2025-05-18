@@ -18,6 +18,9 @@ export class Order {
   status: OrderStatus
 
   @Prop({ required: true, type: Number })
+  itemCount: number
+
+  @Prop({ required: true, type: Number })
   totalPrice: number
 
   @Prop({ required: false, type: Number, enum: PaymentMethod, default: PaymentMethod.COD })

@@ -4,7 +4,7 @@ import { OrderStatus } from 'core/constants/enum'
 import { BadRequestError, NotFoundError } from 'core/exceptions/errors.exception'
 import { DateRangeQueryDto } from 'core/query-string-dtos/date-range-query.dto'
 import { PaginationQueryDto } from 'core/query-string-dtos/pagination-query.dto'
-import { AccountType } from 'core/types/type'
+import { AccountType, ISku } from 'core/types/type'
 import { generateOrderCode } from 'core/utils/utils'
 import { CreateOrderDto } from 'domains/orders/dto/create-order.dto'
 import { OrderQueryDto } from 'domains/orders/dto/order-query.dto'
@@ -156,6 +156,26 @@ export class OrdersService {
         totalDocuments
       }
     }
+  }
+
+  async findOne(id: string) {
+    const orderItemList = await this.orderItemModel.find({ order: id }).lean(true)
+    const skuIds = await orderItemList.map((orderItem) => orderItem.sku.toString())
+
+    const skus: ISku[] = await this.productsService.findAllSkus(skuIds)
+
+    const skuMap = new Map(skus.map((skuDocument) => [skuDocument._id.toString(), skuDocument]))
+
+    // Merge sku info into each item
+    const enrichedItems = orderItemList.map((orderItem) => {
+      const skuInfo = skuMap.get(orderItem.sku.toString())
+      return {
+        ...orderItem, // lấy dữ liệu thực
+        sku: skuInfo ?? null
+      }
+    })
+
+    return enrichedItems
   }
 
   async update(_id: string, updateOrderDto: UpdateOrderDto, account: AccountType) {

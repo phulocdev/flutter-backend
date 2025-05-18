@@ -6,6 +6,7 @@ export declare class Order {
     user: mongoose.Types.ObjectId;
     code: string;
     status: OrderStatus;
+    itemCount: number;
     totalPrice: number;
     paymentMethod: PaymentMethod;
     paymentAt: Date;

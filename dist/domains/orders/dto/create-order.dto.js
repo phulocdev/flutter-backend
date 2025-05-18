@@ -32,6 +32,13 @@ __decorate([
     __metadata("design:type", String)
 ], CreateOrderDto.prototype, "userId", void 0);
 __decorate([
+    (0, class_validator_1.Min)(1, { message: 'itemCount phải >= 1' }),
+    (0, class_validator_1.IsNumber)({ allowNaN: false }, { message: 'itemCount phải là định dạng số' }),
+    (0, class_transformer_1.Transform)(({ value }) => Number(value)),
+    (0, class_validator_1.IsNotEmpty)({ message: 'itemCount không được bỏ trống' }),
+    __metadata("design:type", Number)
+], CreateOrderDto.prototype, "itemCount", void 0);
+__decorate([
     (0, class_validator_1.Min)(1, { message: 'totalPrice phải >= 1' }),
     (0, class_validator_1.IsNumber)({ allowNaN: false }, { message: 'totalPrice phải là định dạng số' }),
     (0, class_transformer_1.Transform)(({ value }) => Number(value)),

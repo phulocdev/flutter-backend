@@ -36,4 +36,11 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)({ message: 'email không được  bỏ trống' }),
     __metadata("design:type", String)
 ], RegisterAccountGuestDto.prototype, "email", void 0);
+__decorate([
+    (0, class_validator_1.Matches)(/(84|0[3|5|7|8|9])+([0-9]{8})\b/g, { message: 'phoneNumber không đúng định dạng' }),
+    (0, class_validator_1.IsString)({ message: 'phoneNumber phải là kiểu dữ liệu là string' }),
+    (0, class_transformer_1.Transform)(({ value }) => String(value).trim()),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], RegisterAccountGuestDto.prototype, "phoneNumber", void 0);
 //# sourceMappingURL=register-account-guest.dto.js.map

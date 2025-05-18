@@ -231,8 +231,8 @@ let AuthService = exports.AuthService = class AuthService {
             throw new errors_exception_1.UnprocessableEntityError([{ field: 'email', message: 'Email không tồn tại trên hệ thống' }]);
         }
         const otpCode = Math.trunc(Math.random() * 1000000);
-        await this.mailService.sendOtp(email, otpCode);
-        await this.otpService.create({ otp: otpCode, email });
+        this.mailService.sendOtp(email, otpCode);
+        this.otpService.create({ otp: otpCode, email });
     }
 };
 exports.AuthService = AuthService = __decorate([

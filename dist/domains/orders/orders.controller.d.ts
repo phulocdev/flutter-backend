@@ -66,6 +66,17 @@ export declare class OrdersController {
             totalDocuments: number;
         };
     }>;
+    findOne(id: string): Promise<{
+        sku: import("core/types/type").ISku;
+        order: import("mongoose").Types.ObjectId;
+        quantity: number;
+        sellingPrice: number;
+        costPrice: number;
+        createdAt?: string;
+        updatedAt?: string;
+        _id: import("mongoose").Types.ObjectId;
+        __v: number;
+    }[]>;
     update(id: string, updateOrderDto: UpdateOrderDto, account: AccountType): Promise<import("mongoose").Document<unknown, {}, import("./schemas/order.schema").Order> & import("./schemas/order.schema").Order & Required<{
         _id: import("mongoose").Types.ObjectId;
     }> & {

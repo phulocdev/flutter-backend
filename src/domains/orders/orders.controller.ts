@@ -35,9 +35,15 @@ export class OrdersController {
   }
 
   @Get('customer')
-  @ResponseMessage('Fetch danh sách đơn hàng thành công')
+  @ResponseMessage('Fetch danh sách đơn hàng của KH thành công')
   findAllByCustomer(@Query() paginationQuery: PaginationQueryDto = {}, @Account() account: AccountType) {
     return this.ordersService.findAllByCustomer({ ...paginationQuery }, account)
+  }
+
+  @Get(':id')
+  @ResponseMessage('Fetch chi tiết đơn hàng thành công')
+  findOne(@Param('id', ValidateMongoIdPipe) id: string) {
+    return this.ordersService.findOne(id)
   }
 
   @Patch(':id')

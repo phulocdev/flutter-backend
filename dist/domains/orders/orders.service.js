@@ -135,6 +135,20 @@ let OrdersService = exports.OrdersService = class OrdersService {
             }
         };
     }
+    async findOne(id) {
+        const orderItemList = await this.orderItemModel.find({ order: id }).lean(true);
+        const skuIds = await orderItemList.map((orderItem) => orderItem.sku.toString());
+        const skus = await this.productsService.findAllSkus(skuIds);
+        const skuMap = new Map(skus.map((skuDocument) => [skuDocument._id.toString(), skuDocument]));
+        const enrichedItems = orderItemList.map((orderItem) => {
+            const skuInfo = skuMap.get(orderItem.sku.toString());
+            return {
+                ...orderItem,
+                sku: skuInfo ?? null
+            };
+        });
+        return enrichedItems;
+    }
     async update(_id, updateOrderDto, account) {
         const order = await this.orderModel.findOne({ _id });
         if (!order) {

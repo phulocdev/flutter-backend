@@ -39,6 +39,9 @@ let OrdersController = exports.OrdersController = class OrdersController {
     findAllByCustomer(paginationQuery = {}, account) {
         return this.ordersService.findAllByCustomer({ ...paginationQuery }, account);
     }
+    findOne(id) {
+        return this.ordersService.findOne(id);
+    }
     update(id, updateOrderDto, account) {
         return this.ordersService.update(id, updateOrderDto, account);
     }
@@ -72,13 +75,21 @@ __decorate([
 ], OrdersController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)('customer'),
-    (0, response_message_decorator_1.ResponseMessage)('Fetch danh sách đơn hàng thành công'),
+    (0, response_message_decorator_1.ResponseMessage)('Fetch danh sách đơn hàng của KH thành công'),
     __param(0, (0, common_1.Query)()),
     __param(1, (0, account_decorator_1.Account)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [pagination_query_dto_1.PaginationQueryDto, Object]),
     __metadata("design:returntype", void 0)
 ], OrdersController.prototype, "findAllByCustomer", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    (0, response_message_decorator_1.ResponseMessage)('Fetch chi tiết đơn hàng thành công'),
+    __param(0, (0, common_1.Param)('id', validate_mongo_id_pipe_1.ValidateMongoIdPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], OrdersController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Patch)(':id'),
     (0, response_message_decorator_1.ResponseMessage)('Cập nhật đơn hàng thành công'),

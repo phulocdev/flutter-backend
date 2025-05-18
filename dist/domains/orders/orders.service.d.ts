@@ -1,6 +1,6 @@
 import { DateRangeQueryDto } from 'core/query-string-dtos/date-range-query.dto';
 import { PaginationQueryDto } from 'core/query-string-dtos/pagination-query.dto';
-import { AccountType } from 'core/types/type';
+import { AccountType, ISku } from 'core/types/type';
 import { CreateOrderDto } from 'domains/orders/dto/create-order.dto';
 import { OrderQueryDto } from 'domains/orders/dto/order-query.dto';
 import { UpdateOrderDto } from 'domains/orders/dto/update-order.dto';
@@ -44,6 +44,17 @@ export declare class OrdersService {
             totalDocuments: number;
         };
     }>;
+    findOne(id: string): Promise<{
+        sku: ISku;
+        order: mongoose.Types.ObjectId;
+        quantity: number;
+        sellingPrice: number;
+        costPrice: number;
+        createdAt?: string;
+        updatedAt?: string;
+        _id: mongoose.Types.ObjectId;
+        __v: number;
+    }[]>;
     update(_id: string, updateOrderDto: UpdateOrderDto, account: AccountType): Promise<mongoose.Document<unknown, {}, Order> & Order & Required<{
         _id: mongoose.Types.ObjectId;
     }> & {

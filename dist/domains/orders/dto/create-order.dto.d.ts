@@ -4,6 +4,7 @@ import { ShippingInfoDto } from 'domains/orders/dto/shipping-info.dto';
 export declare class CreateOrderDto {
     items: OrderItemDto[];
     userId?: string;
+    itemCount: number;
     totalPrice: number;
     paymentMethod: PaymentMethod;
     shippingInfo: ShippingInfoDto;
