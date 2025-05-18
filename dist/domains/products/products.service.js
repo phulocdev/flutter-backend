@@ -121,10 +121,13 @@ let ProductsService = exports.ProductsService = class ProductsService {
         }
     }
     async findAll(qs) {
-        const { page, limit, from, to, sort: sortQuery, name, brandIds, categoryIds, code, maxPrice, minPrice, status } = qs;
+        const { page, limit, from, to, sort: sortQuery, name, brandIds, categoryIds, code, hasDiscount, maxPrice, minPrice, status } = qs;
         const filter = {};
         if (name) {
             filter.name = { $regex: name, $options: 'i' };
+        }
+        if (hasDiscount) {
+            filter.discountPercentage = { $gte: 0 };
         }
         if (code) {
             filter.code = { $regex: code, $options: 'i' };
@@ -416,6 +419,15 @@ let ProductsService = exports.ProductsService = class ProductsService {
             }
         }));
         this.skuModel.bulkWrite(operations);
+    }
+    increaseSoldQuantity(items) {
+        const operations = items.map(({ productId, quantity }) => ({
+            updateOne: {
+                filter: { _id: productId },
+                update: { $inc: { soldQuantity: quantity } }
+            }
+        }));
+        this.productModel.bulkWrite(operations);
     }
     async findOneSku(skuId) {
         const sku = await this.skuModel.findOne({ _id: skuId });

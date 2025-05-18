@@ -40,6 +40,12 @@ export class OrdersController {
     return this.ordersService.findAllByCustomer({ ...paginationQuery }, account)
   }
 
+  @Get('a/:id')
+  @ResponseMessage('Fetch chi tiết đơn hàng thành công')
+  findOneA(@Param('id', ValidateMongoIdPipe) id: string) {
+    return this.ordersService.findOrderDoc(id)
+  }
+
   @Get(':id')
   @ResponseMessage('Fetch chi tiết đơn hàng thành công')
   findOne(@Param('id', ValidateMongoIdPipe) id: string) {

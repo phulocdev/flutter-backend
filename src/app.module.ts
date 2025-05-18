@@ -14,6 +14,8 @@ import { MailModule } from './domains/mail/mail.module'
 import { MediaModule } from './domains/media/media.module'
 import { ProductsModule } from './domains/products/products.module'
 import { OtpsModule } from 'domains/otps/otps.module'
+import { CommentsModule } from './domains/comments/comments.module'
+import { CouponsModule } from './domains/coupons/coupons.module';
 
 @Module({
   imports: [
@@ -28,7 +30,9 @@ import { OtpsModule } from 'domains/otps/otps.module'
     CloudinaryModule,
     BrandsModule,
     CartModule,
-    MailModule
+    MailModule,
+    CommentsModule,
+    CouponsModule
   ],
   controllers: [AppController],
   providers: [AppService]

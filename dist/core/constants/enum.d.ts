@@ -16,14 +16,12 @@ export declare const discountTypeOptions: string;
 export declare enum OrderStatus {
     PROCESSING = 0,
     PENDING_PAYMENT = 1,
-    PAID = 2,
-    PACKED = 3,
-    SHIPPED = 4,
-    READY_TO_SHIP = 5,
-    COMPLETED = 6,
-    CANCELED = 7,
-    RETURNED = 8,
-    DELIVERED = 9
+    PACKED = 2,
+    SHIPPED = 3,
+    DELIVERED = 4,
+    COMPLETED = 5,
+    RETURNED = 6,
+    CANCELED = 7
 }
 export declare const orderStatusOptions: string;
 export declare enum PaymentMethod {

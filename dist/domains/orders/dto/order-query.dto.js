@@ -13,61 +13,104 @@ exports.OrderQueryDto = void 0;
 const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
 const enum_1 = require("../../../core/constants/enum");
-const is_unique_array_decorator_1 = require("../../../core/decorators/is-unique-array.decorator");
 class OrderQueryDto {
 }
 exports.OrderQueryDto = OrderQueryDto;
 __decorate([
     (0, class_validator_1.MinLength)(5, { message: 'sort phải có ít nhất 5 ký tự' }),
-    (0, class_validator_1.IsString)({ message: 'sort phải là định dạng chuỗi' }),
+    (0, class_validator_1.IsString)({ message: 'sort phải là chuỗi' }),
     (0, class_transformer_1.Type)(() => String),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], OrderQueryDto.prototype, "sort", void 0);
 __decorate([
     (0, class_validator_1.MinLength)(1, { message: 'code phải có ít nhất 1 ký tự' }),
-    (0, class_validator_1.IsString)({ message: 'code phải là định dạng chuỗi' }),
-    (0, class_transformer_1.Type)(() => String),
+    (0, class_validator_1.IsString)({ message: 'code phải là chuỗi' }),
     (0, class_transformer_1.Transform)(({ value }) => String(value).trim()),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], OrderQueryDto.prototype, "code", void 0);
 __decorate([
-    (0, class_validator_1.MinLength)(1, { message: 'customerCode phải có ít nhất 1 ký tự' }),
-    (0, class_validator_1.IsString)({ message: 'customerCode phải là định dạng chuỗi' }),
-    (0, class_transformer_1.Transform)(({ value }) => String(value).trim()),
-    (0, class_transformer_1.Type)(() => String),
+    (0, class_validator_1.IsMongoId)({ message: 'userId phải là ObjectId' }),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
-], OrderQueryDto.prototype, "customerCode", void 0);
+], OrderQueryDto.prototype, "userId", void 0);
 __decorate([
-    (0, is_unique_array_decorator_1.IsUniqueArray)('Các phần tử trong status không được trùng lặp'),
     (0, class_validator_1.IsEnum)(enum_1.OrderStatus, {
-        each: true,
-        message: `status phải là một trong những giá trị sau: ${enum_1.orderStatusOptions} và được ngăn cách bằng dấu ,`
+        message: `status phải là một trong các giá trị sau: ${Object.values(enum_1.OrderStatus).join(' || ')}`
     }),
-    (0, class_transformer_1.Transform)(({ value }) => value.split(',').map((v) => v.trim())),
     (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", Array)
+    __metadata("design:type", Number)
 ], OrderQueryDto.prototype, "status", void 0);
 __decorate([
-    (0, is_unique_array_decorator_1.IsUniqueArray)('Các phần tử trong tableNumber không được trùng lặp'),
-    (0, class_validator_1.IsPositive)({ each: true, message: 'tableNumber phải chứa các số bàn > 0' }),
-    (0, class_validator_1.IsInt)({
-        each: true,
-        message: `tableNumber phải là chuỗi gồm các số nguyên và được ngăn cách bằng dấu ,`
+    (0, class_validator_1.IsEnum)(enum_1.PaymentMethod, {
+        message: `paymentMethod phải là một trong các giá trị sau: ${Object.values(enum_1.PaymentMethod).join(' || ')}`
     }),
-    (0, class_validator_1.ArrayMinSize)(1, { message: 'tableNumber phải có ít nhất một số bàn' }),
-    (0, class_transformer_1.Transform)(({ value }) => value
-        .split(',')
-        .filter((v) => Boolean(v) && v.trim().length > 0)
-        .map((v) => Number(v))),
     (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", Array)
-], OrderQueryDto.prototype, "tableNumber", void 0);
+    __metadata("design:type", Number)
+], OrderQueryDto.prototype, "paymentMethod", void 0);
 __decorate([
-    (0, class_validator_1.IsMongoId)({ message: 'customerId phải là định dạng ObjectId' }),
+    (0, class_transformer_1.Type)(() => Number),
+    (0, class_validator_1.IsNumber)({}, { message: 'minTotalPrice phải là số' }),
+    (0, class_validator_1.Min)(0, { message: 'minTotalPrice phải >= 0' }),
     (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", String)
-], OrderQueryDto.prototype, "customerId", void 0);
+    __metadata("design:type", Number)
+], OrderQueryDto.prototype, "minTotalPrice", void 0);
+__decorate([
+    (0, class_transformer_1.Type)(() => Number),
+    (0, class_validator_1.IsNumber)({}, { message: 'maxTotalPrice phải là số' }),
+    (0, class_validator_1.Min)(0, { message: 'maxTotalPrice phải >= 0' }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Number)
+], OrderQueryDto.prototype, "maxTotalPrice", void 0);
+__decorate([
+    (0, class_transformer_1.Type)(() => Number),
+    (0, class_validator_1.IsNumber)({}, { message: 'minItemCount phải là số' }),
+    (0, class_validator_1.Min)(1, { message: 'minItemCount phải >= 1' }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Number)
+], OrderQueryDto.prototype, "minItemCount", void 0);
+__decorate([
+    (0, class_transformer_1.Type)(() => Number),
+    (0, class_validator_1.IsNumber)({}, { message: 'maxItemCount phải là số' }),
+    (0, class_validator_1.Min)(1, { message: 'maxItemCount phải >= 1' }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Number)
+], OrderQueryDto.prototype, "maxItemCount", void 0);
+__decorate([
+    (0, class_transformer_1.Type)(() => Date),
+    (0, class_validator_1.IsDate)({ message: 'fromDate phải là ngày' }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Date)
+], OrderQueryDto.prototype, "fromDate", void 0);
+__decorate([
+    (0, class_transformer_1.Type)(() => Date),
+    (0, class_validator_1.IsDate)({ message: 'toDate phải là ngày' }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Date)
+], OrderQueryDto.prototype, "toDate", void 0);
+__decorate([
+    (0, class_transformer_1.Type)(() => Date),
+    (0, class_validator_1.IsDate)({ message: 'paymentFromDate phải là ngày' }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Date)
+], OrderQueryDto.prototype, "paymentFromDate", void 0);
+__decorate([
+    (0, class_transformer_1.Type)(() => Date),
+    (0, class_validator_1.IsDate)({ message: 'paymentToDate phải là ngày' }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Date)
+], OrderQueryDto.prototype, "paymentToDate", void 0);
+__decorate([
+    (0, class_transformer_1.Type)(() => Date),
+    (0, class_validator_1.IsDate)({ message: 'deliveredFromDate phải là ngày' }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Date)
+], OrderQueryDto.prototype, "deliveredFromDate", void 0);
+__decorate([
+    (0, class_transformer_1.Type)(() => Date),
+    (0, class_validator_1.IsDate)({ message: 'deliveredToDate phải là ngày' }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Date)
+], OrderQueryDto.prototype, "deliveredToDate", void 0);
 //# sourceMappingURL=order-query.dto.js.map

@@ -7,20 +7,20 @@ import { UpdateOrderDto } from 'domains/orders/dto/update-order.dto';
 import { OrderItem } from 'domains/orders/schemas/order-item.schema';
 import { Order } from 'domains/orders/schemas/order.schema';
 import { ProductsService } from 'domains/products/products.service';
-import mongoose, { Model } from 'mongoose';
+import mongoose, { Model, Types } from 'mongoose';
 export declare class OrdersService {
     private readonly orderModel;
     private readonly orderItemModel;
     private readonly productsService;
     constructor(orderModel: Model<Order>, orderItemModel: Model<OrderItem>, productsService: ProductsService);
     create(createOrderDto: CreateOrderDto): Promise<mongoose.Document<unknown, {}, Order> & Order & Required<{
-        _id: mongoose.Types.ObjectId;
+        _id: Types.ObjectId;
     }> & {
         __v: number;
     }>;
     findAll(qs: PaginationQueryDto & DateRangeQueryDto & OrderQueryDto): Promise<{
         data: (mongoose.Document<unknown, {}, Order> & Order & Required<{
-            _id: mongoose.Types.ObjectId;
+            _id: Types.ObjectId;
         }> & {
             __v: number;
         })[];
@@ -33,7 +33,7 @@ export declare class OrdersService {
     }>;
     findAllByCustomer(qs: PaginationQueryDto, account: AccountType): Promise<{
         data: (mongoose.Document<unknown, {}, Order> & Order & Required<{
-            _id: mongoose.Types.ObjectId;
+            _id: Types.ObjectId;
         }> & {
             __v: number;
         })[];
@@ -44,19 +44,24 @@ export declare class OrdersService {
             totalDocuments: number;
         };
     }>;
+    findOrderDoc(id: string): Promise<mongoose.Document<unknown, {}, Order> & Order & Required<{
+        _id: Types.ObjectId;
+    }> & {
+        __v: number;
+    }>;
     findOne(id: string): Promise<{
         sku: ISku;
-        order: mongoose.Types.ObjectId;
+        order: Types.ObjectId;
         quantity: number;
         sellingPrice: number;
         costPrice: number;
         createdAt?: string;
         updatedAt?: string;
-        _id: mongoose.Types.ObjectId;
+        _id: Types.ObjectId;
         __v: number;
     }[]>;
     update(_id: string, updateOrderDto: UpdateOrderDto, account: AccountType): Promise<mongoose.Document<unknown, {}, Order> & Order & Required<{
-        _id: mongoose.Types.ObjectId;
+        _id: Types.ObjectId;
     }> & {
         __v: number;
     }>;

@@ -46,6 +46,13 @@ __decorate([
     __metadata("design:type", Number)
 ], CreateOrderDto.prototype, "totalPrice", void 0);
 __decorate([
+    (0, class_validator_1.Min)(1, { message: 'totalPrice phải >= 1' }),
+    (0, class_validator_1.IsNumber)({ allowNaN: false }, { message: 'totalPrice phải là định dạng số' }),
+    (0, class_transformer_1.Transform)(({ value }) => Number(value)),
+    (0, class_validator_1.IsOptional)({ message: 'totalPrice không được bỏ trống' }),
+    __metadata("design:type", Number)
+], CreateOrderDto.prototype, "discountAmount", void 0);
+__decorate([
     (0, class_validator_1.IsEnum)(enum_1.PaymentMethod, {
         message: `paymentMethod phải là một trong những giá trị sau: ${enum_1.paymentMethodOptions}`
     }),

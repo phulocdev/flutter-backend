@@ -35,6 +35,9 @@ export class Order {
   @Prop({ required: false, type: Date, default: '' })
   cancelledAt: Date
 
+  @Prop({ required: false, type: Number, default: 0 })
+  discountAmount: number
+
   @Prop(ShippingInfoSchema)
   shippingInfo: ShippingInfo
 

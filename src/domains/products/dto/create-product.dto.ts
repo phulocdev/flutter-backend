@@ -8,6 +8,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  Max,
   MaxLength,
   Min,
   MinLength,
@@ -52,6 +53,13 @@ export class CreateProductDto {
   @Transform(({ value }) => Number(value))
   @IsNotEmpty({ message: 'basePrice không được bỏ trống' })
   basePrice: number
+
+  @Max(100, { message: 'discountPercentage phải < 100' })
+  @Min(1, { message: 'discountPercentage phải >= 1' })
+  @IsNumber({ allowNaN: false }, { message: 'discountPercentage phải là định dạng số' })
+  @Transform(({ value }) => Number(value))
+  @IsOptional()
+  discountPercentage: number
 
   @IsString({ message: 'imageUrl phải là kiểu dữ liệu là string' })
   @Transform(({ value }) => String(value).trim())

@@ -50,6 +50,14 @@ __decorate([
     __metadata("design:type", Number)
 ], CreateProductDto.prototype, "basePrice", void 0);
 __decorate([
+    (0, class_validator_1.Max)(100, { message: 'discountPercentage phải < 100' }),
+    (0, class_validator_1.Min)(1, { message: 'discountPercentage phải >= 1' }),
+    (0, class_validator_1.IsNumber)({ allowNaN: false }, { message: 'discountPercentage phải là định dạng số' }),
+    (0, class_transformer_1.Transform)(({ value }) => Number(value)),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Number)
+], CreateProductDto.prototype, "discountPercentage", void 0);
+__decorate([
     (0, class_validator_1.IsString)({ message: 'imageUrl phải là kiểu dữ liệu là string' }),
     (0, class_transformer_1.Transform)(({ value }) => String(value).trim()),
     (0, class_validator_1.IsOptional)(),

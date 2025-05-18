@@ -5,6 +5,7 @@ export declare class CreateProductDto {
     category: string;
     brand: string;
     basePrice: number;
+    discountPercentage: number;
     imageUrl?: string;
     minStockLevel: number;
     maxStockLevel: number;

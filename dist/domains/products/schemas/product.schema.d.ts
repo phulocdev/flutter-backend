@@ -12,6 +12,8 @@ export declare class Product {
     category: Category;
     brand: Brand;
     status: ProductStatus;
+    soldQuantity: number;
+    discountPercentage: number;
     basePrice: number;
     minStockLevel: number;
     maxStockLevel: number;

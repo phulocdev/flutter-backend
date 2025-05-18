@@ -39,6 +39,9 @@ let OrdersController = exports.OrdersController = class OrdersController {
     findAllByCustomer(paginationQuery = {}, account) {
         return this.ordersService.findAllByCustomer({ ...paginationQuery }, account);
     }
+    findOneA(id) {
+        return this.ordersService.findOrderDoc(id);
+    }
     findOne(id) {
         return this.ordersService.findOne(id);
     }
@@ -82,6 +85,14 @@ __decorate([
     __metadata("design:paramtypes", [pagination_query_dto_1.PaginationQueryDto, Object]),
     __metadata("design:returntype", void 0)
 ], OrdersController.prototype, "findAllByCustomer", null);
+__decorate([
+    (0, common_1.Get)('a/:id'),
+    (0, response_message_decorator_1.ResponseMessage)('Fetch chi tiết đơn hàng thành công'),
+    __param(0, (0, common_1.Param)('id', validate_mongo_id_pipe_1.ValidateMongoIdPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], OrdersController.prototype, "findOneA", null);
 __decorate([
     (0, common_1.Get)(':id'),
     (0, response_message_decorator_1.ResponseMessage)('Fetch chi tiết đơn hàng thành công'),

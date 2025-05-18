@@ -1,56 +1,87 @@
 import { Transform, Type } from 'class-transformer'
-import { ArrayMinSize, IsEnum, IsInt, IsMongoId, IsOptional, IsPositive, IsString, MinLength } from 'class-validator'
-import { OrderStatus, orderStatusOptions } from 'core/constants/enum'
-import { IsUniqueArray } from 'core/decorators/is-unique-array.decorator'
+import { IsString, IsOptional, MinLength, IsMongoId, IsEnum, IsNumber, Min, IsDate } from 'class-validator'
+import { OrderStatus, PaymentMethod } from 'core/constants/enum'
 
 export class OrderQueryDto {
   @MinLength(5, { message: 'sort phải có ít nhất 5 ký tự' })
-  @IsString({ message: 'sort phải là định dạng chuỗi' })
+  @IsString({ message: 'sort phải là chuỗi' })
   @Type(() => String)
   @IsOptional()
-  sort?: string | undefined
+  sort?: string
 
   @MinLength(1, { message: 'code phải có ít nhất 1 ký tự' })
-  @IsString({ message: 'code phải là định dạng chuỗi' })
-  @Type(() => String)
+  @IsString({ message: 'code phải là chuỗi' })
   @Transform(({ value }) => String(value).trim())
   @IsOptional()
-  code?: string | undefined
+  code?: string
 
-  @MinLength(1, { message: 'customerCode phải có ít nhất 1 ký tự' })
-  @IsString({ message: 'customerCode phải là định dạng chuỗi' })
-  @Transform(({ value }) => String(value).trim())
-  @Type(() => String)
+  @IsMongoId({ message: 'userId phải là ObjectId' })
   @IsOptional()
-  customerCode?: string | undefined
+  userId?: string
 
-  // NOTE: VALIDATE ARRAY OF ENUM
-  @IsUniqueArray('Các phần tử trong status không được trùng lặp')
   @IsEnum(OrderStatus, {
-    each: true,
-    message: `status phải là một trong những giá trị sau: ${orderStatusOptions} và được ngăn cách bằng dấu ,`
+    message: `status phải là một trong các giá trị sau: ${Object.values(OrderStatus).join(' || ')}`
   })
-  @Transform(({ value }: { value: string }) => value.split(',').map((v) => v.trim()))
   @IsOptional()
-  status?: OrderStatus[] | undefined
+  status?: OrderStatus
 
-  @IsUniqueArray('Các phần tử trong tableNumber không được trùng lặp')
-  @IsPositive({ each: true, message: 'tableNumber phải chứa các số bàn > 0' })
-  @IsInt({
-    each: true,
-    message: `tableNumber phải là chuỗi gồm các số nguyên và được ngăn cách bằng dấu ,`
+  @IsEnum(PaymentMethod, {
+    message: `paymentMethod phải là một trong các giá trị sau: ${Object.values(PaymentMethod).join(' || ')}`
   })
-  @ArrayMinSize(1, { message: 'tableNumber phải có ít nhất một số bàn' })
-  @Transform(({ value }: { value: string }) =>
-    value
-      .split(',')
-      .filter((v) => Boolean(v) && v.trim().length > 0)
-      .map((v) => Number(v))
-  )
   @IsOptional()
-  tableNumber?: number[] | undefined
+  paymentMethod?: PaymentMethod
 
-  @IsMongoId({ message: 'customerId phải là định dạng ObjectId' })
+  @Type(() => Number)
+  @IsNumber({}, { message: 'minTotalPrice phải là số' })
+  @Min(0, { message: 'minTotalPrice phải >= 0' })
   @IsOptional()
-  customerId?: string | undefined
+  minTotalPrice?: number
+
+  @Type(() => Number)
+  @IsNumber({}, { message: 'maxTotalPrice phải là số' })
+  @Min(0, { message: 'maxTotalPrice phải >= 0' })
+  @IsOptional()
+  maxTotalPrice?: number
+
+  @Type(() => Number)
+  @IsNumber({}, { message: 'minItemCount phải là số' })
+  @Min(1, { message: 'minItemCount phải >= 1' })
+  @IsOptional()
+  minItemCount?: number
+
+  @Type(() => Number)
+  @IsNumber({}, { message: 'maxItemCount phải là số' })
+  @Min(1, { message: 'maxItemCount phải >= 1' })
+  @IsOptional()
+  maxItemCount?: number
+
+  @Type(() => Date)
+  @IsDate({ message: 'fromDate phải là ngày' })
+  @IsOptional()
+  fromDate?: Date
+
+  @Type(() => Date)
+  @IsDate({ message: 'toDate phải là ngày' })
+  @IsOptional()
+  toDate?: Date
+
+  @Type(() => Date)
+  @IsDate({ message: 'paymentFromDate phải là ngày' })
+  @IsOptional()
+  paymentFromDate?: Date
+
+  @Type(() => Date)
+  @IsDate({ message: 'paymentToDate phải là ngày' })
+  @IsOptional()
+  paymentToDate?: Date
+
+  @Type(() => Date)
+  @IsDate({ message: 'deliveredFromDate phải là ngày' })
+  @IsOptional()
+  deliveredFromDate?: Date
+
+  @Type(() => Date)
+  @IsDate({ message: 'deliveredToDate phải là ngày' })
+  @IsOptional()
+  deliveredToDate?: Date
 }

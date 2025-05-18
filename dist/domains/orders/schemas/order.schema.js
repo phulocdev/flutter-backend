@@ -60,6 +60,10 @@ __decorate([
     __metadata("design:type", Date)
 ], Order.prototype, "cancelledAt", void 0);
 __decorate([
+    (0, mongoose_1.Prop)({ required: false, type: Number, default: 0 }),
+    __metadata("design:type", Number)
+], Order.prototype, "discountAmount", void 0);
+__decorate([
     (0, mongoose_1.Prop)(shipping_info_schema_1.ShippingInfoSchema),
     __metadata("design:type", shipping_info_schema_1.ShippingInfo)
 ], Order.prototype, "shippingInfo", void 0);

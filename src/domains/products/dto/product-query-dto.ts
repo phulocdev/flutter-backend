@@ -10,7 +10,10 @@ import {
   Max,
   ArrayMinSize,
   IsArray,
-  IsNotEmpty
+  IsNotEmpty,
+  IsBooleanString,
+  IsBoolean,
+  IsInt
 } from 'class-validator'
 import { ProductStatus } from 'core/constants/enum'
 import { IsUniqueArray } from 'core/decorators/is-unique-array.decorator'
@@ -53,6 +56,10 @@ export class ProductQueryDto {
   @Transform(({ value }: { value: string }) => value.split(',').filter((v) => !!v && v.trim().length > 0))
   @IsOptional()
   brandIds?: string[]
+
+  @IsInt()
+  @IsOptional()
+  hasDiscount: number
 
   @IsEnum(ProductStatus, {
     message: `status phải là một trong các giá trị sau: ${Object.values(ProductStatus).join(' || ')}`

@@ -16,6 +16,7 @@ import { ProductsModule } from 'domains/products/products.module'
     ProductsModule
   ],
   controllers: [OrdersController],
-  providers: [OrdersService]
+  providers: [OrdersService],
+  exports: [OrdersService]
 })
 export class OrdersModule {}

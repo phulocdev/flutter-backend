@@ -61,6 +61,11 @@ __decorate([
     __metadata("design:type", Array)
 ], ProductQueryDto.prototype, "brandIds", void 0);
 __decorate([
+    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Number)
+], ProductQueryDto.prototype, "hasDiscount", void 0);
+__decorate([
     (0, class_validator_1.IsEnum)(enum_1.ProductStatus, {
         message: `status phải là một trong các giá trị sau: ${Object.values(enum_1.ProductStatus).join(' || ')}`
     }),

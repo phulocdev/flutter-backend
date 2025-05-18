@@ -21,16 +21,14 @@ export const discountTypeOptions = Object.entries(DiscountType)
   .join(' || ')
 
 export enum OrderStatus {
-  PROCESSING,
-  PENDING_PAYMENT,
-  PAID,
-  PACKED,
-  SHIPPED,
-  READY_TO_SHIP,
-  COMPLETED,
-  CANCELED,
-  RETURNED,
-  DELIVERED
+  PROCESSING = 0, // Chờ xác nhận
+  PENDING_PAYMENT = 1, // Đã xác nhận
+  PACKED = 2, // Đang chuẩn bị
+  SHIPPED = 3, // Đang giao hàng
+  DELIVERED = 4, // Đã giao hàng
+  COMPLETED = 5, // Hoàn thành
+  RETURNED = 6, // Đang hoàn trả
+  CANCELED = 7 // Đã hủy
 }
 
 export const orderStatusOptions = Object.entries(OrderStatus)

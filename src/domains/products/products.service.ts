@@ -124,7 +124,21 @@ export class ProductsService {
   }
 
   async findAll(qs: PaginationQueryDto & DateRangeQueryDto & ProductQueryDto) {
-    const { page, limit, from, to, sort: sortQuery, name, brandIds, categoryIds, code, maxPrice, minPrice, status } = qs
+    const {
+      page,
+      limit,
+      from,
+      to,
+      sort: sortQuery,
+      name,
+      brandIds,
+      categoryIds,
+      code,
+      hasDiscount,
+      maxPrice,
+      minPrice,
+      status
+    } = qs
     // sort và status là những query có gtri đặc biệt -> phải transform thành cú pháp hợp lệ trước khi mà thực hiện filter
     // customerCode và tableNumber là query đặc biệt -> dùng để query nested Object
     // Cho nên ta phải tasck 3 query value đó ra riêng
@@ -142,6 +156,10 @@ export class ProductsService {
 
     if (name) {
       filter.name = { $regex: name, $options: 'i' }
+    }
+
+    if (hasDiscount) {
+      filter.discountPercentage = { $gte: 0 }
     }
 
     if (code) {
@@ -516,6 +534,17 @@ export class ProductsService {
     }))
 
     this.skuModel.bulkWrite(operations)
+  }
+
+  increaseSoldQuantity(items: { productId: string; quantity: number }[]) {
+    const operations = items.map(({ productId, quantity }) => ({
+      updateOne: {
+        filter: { _id: productId },
+        update: { $inc: { soldQuantity: quantity } }
+      }
+    }))
+
+    this.productModel.bulkWrite(operations)
   }
 
   async findOneSku(skuId: string) {

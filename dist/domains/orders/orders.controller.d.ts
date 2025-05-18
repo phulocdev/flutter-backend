@@ -66,6 +66,11 @@ export declare class OrdersController {
             totalDocuments: number;
         };
     }>;
+    findOneA(id: string): Promise<import("mongoose").Document<unknown, {}, import("./schemas/order.schema").Order> & import("./schemas/order.schema").Order & Required<{
+        _id: import("mongoose").Types.ObjectId;
+    }> & {
+        __v: number;
+    }>;
     findOne(id: string): Promise<{
         sku: import("core/types/type").ISku;
         order: import("mongoose").Types.ObjectId;

@@ -73,6 +73,14 @@ __decorate([
     __metadata("design:type", String)
 ], Product.prototype, "status", void 0);
 __decorate([
+    (0, mongoose_1.Prop)({ required: false, type: Number, default: 0 }),
+    __metadata("design:type", Number)
+], Product.prototype, "soldQuantity", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: false, type: Number, default: 0 }),
+    __metadata("design:type", Number)
+], Product.prototype, "discountPercentage", void 0);
+__decorate([
     (0, mongoose_1.Prop)({ required: true, type: Number }),
     __metadata("design:type", Number)
 ], Product.prototype, "basePrice", void 0);

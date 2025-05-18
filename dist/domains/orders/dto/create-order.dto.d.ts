@@ -6,6 +6,7 @@ export declare class CreateOrderDto {
     userId?: string;
     itemCount: number;
     totalPrice: number;
+    discountAmount: number;
     paymentMethod: PaymentMethod;
     shippingInfo: ShippingInfoDto;
 }

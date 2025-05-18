@@ -12,6 +12,7 @@ export declare class Order {
     paymentAt: Date;
     deliveredAt: Date;
     cancelledAt: Date;
+    discountAmount: number;
     shippingInfo: ShippingInfo;
     updateBy: mongoose.Types.ObjectId;
 }

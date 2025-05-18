@@ -1,9 +1,18 @@
-import { OrderStatus } from 'core/constants/enum';
+import { OrderStatus, PaymentMethod } from 'core/constants/enum';
 export declare class OrderQueryDto {
-    sort?: string | undefined;
-    code?: string | undefined;
-    customerCode?: string | undefined;
-    status?: OrderStatus[] | undefined;
-    tableNumber?: number[] | undefined;
-    customerId?: string | undefined;
+    sort?: string;
+    code?: string;
+    userId?: string;
+    status?: OrderStatus;
+    paymentMethod?: PaymentMethod;
+    minTotalPrice?: number;
+    maxTotalPrice?: number;
+    minItemCount?: number;
+    maxItemCount?: number;
+    fromDate?: Date;
+    toDate?: Date;
+    paymentFromDate?: Date;
+    paymentToDate?: Date;
+    deliveredFromDate?: Date;
+    deliveredToDate?: Date;
 }

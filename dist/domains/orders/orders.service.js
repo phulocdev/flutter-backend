@@ -62,6 +62,10 @@ let OrdersService = exports.OrdersService = class OrdersService {
             sku,
             quantity
         }));
+        const productsWithDecreaseQuantity = items.map(({ productId, quantity }) => ({
+            productId,
+            quantity
+        }));
         const session = await this.orderModel.db.startSession();
         try {
             session.startTransaction();
@@ -76,6 +80,7 @@ let OrdersService = exports.OrdersService = class OrdersService {
             ], { session });
             await session.commitTransaction();
             this.productsService.decreaseStockOnHand({ items: skusWithDecreaseQuantity });
+            this.productsService.increaseSoldQuantity(productsWithDecreaseQuantity);
             return createdOrder[0];
         }
         catch (error) {
@@ -87,13 +92,33 @@ let OrdersService = exports.OrdersService = class OrdersService {
         }
     }
     async findAll(qs) {
-        const { page, limit, from, to, sort: sortQuery } = qs;
+        const { page, limit, from, to, sort: sortQuery, code, userId, status, paymentMethod, minTotalPrice, maxTotalPrice, minItemCount, maxItemCount, paymentFromDate, paymentToDate, deliveredFromDate, deliveredToDate } = qs;
         const filter = {};
-        let sort = { createdAt: -1 };
-        if (sortQuery) {
-            const sortField = sortQuery.split('.')[0];
-            const isDescending = sortQuery.split('.')[1] === 'desc';
-            sort = isDescending ? { [sortField]: -1 } : { [sortField]: 1 };
+        if (userId) {
+            filter.user = new mongoose_2.Types.ObjectId(userId);
+        }
+        if (code) {
+            filter.code = { $regex: code, $options: 'i' };
+        }
+        if (status !== undefined) {
+            filter.status = status;
+        }
+        if (paymentMethod) {
+            filter.paymentMethod = paymentMethod;
+        }
+        if (minTotalPrice !== undefined || maxTotalPrice !== undefined) {
+            filter.totalPrice = {};
+            if (minTotalPrice !== undefined)
+                filter.totalPrice.$gte = minTotalPrice;
+            if (maxTotalPrice !== undefined)
+                filter.totalPrice.$lte = maxTotalPrice;
+        }
+        if (minItemCount !== undefined || maxItemCount !== undefined) {
+            filter.itemCount = {};
+            if (minItemCount !== undefined)
+                filter.itemCount.$gte = minItemCount;
+            if (maxItemCount !== undefined)
+                filter.itemCount.$lte = maxItemCount;
         }
         if (from || to) {
             filter.createdAt = {};
@@ -101,6 +126,26 @@ let OrdersService = exports.OrdersService = class OrdersService {
                 filter.createdAt.$gte = from;
             if (to)
                 filter.createdAt.$lt = to;
+        }
+        if (paymentFromDate || paymentToDate) {
+            filter.paymentAt = {};
+            if (paymentFromDate)
+                filter.paymentAt.$gte = paymentFromDate;
+            if (paymentToDate)
+                filter.paymentAt.$lt = paymentToDate;
+        }
+        if (deliveredFromDate || deliveredToDate) {
+            filter.deliveredAt = {};
+            if (deliveredFromDate)
+                filter.deliveredAt.$gte = deliveredFromDate;
+            if (deliveredToDate)
+                filter.deliveredAt.$lt = deliveredToDate;
+        }
+        let sort = { createdAt: -1 };
+        if (sortQuery) {
+            const sortField = sortQuery.split('.')[0];
+            const isDescending = sortQuery.split('.')[1] === 'desc';
+            sort = isDescending ? { [sortField]: -1 } : { [sortField]: 1 };
         }
         const query = this.orderModel.find(filter).sort(sort);
         if (limit && page) {
@@ -135,8 +180,11 @@ let OrdersService = exports.OrdersService = class OrdersService {
             }
         };
     }
+    async findOrderDoc(id) {
+        return this.orderModel.findOne({ _id: id });
+    }
     async findOne(id) {
-        const orderItemList = await this.orderItemModel.find({ order: id }).lean(true);
+        const orderItemList = await this.orderItemModel.find({ order: new mongoose_2.Types.ObjectId(id) }).lean(true);
         const skuIds = await orderItemList.map((orderItem) => orderItem.sku.toString());
         const skus = await this.productsService.findAllSkus(skuIds);
         const skuMap = new Map(skus.map((skuDocument) => [skuDocument._id.toString(), skuDocument]));
@@ -163,7 +211,7 @@ let OrdersService = exports.OrdersService = class OrdersService {
         else if (nextStatus === enum_1.OrderStatus.CANCELED) {
             updateOrderDto.cancelledAt = now;
         }
-        else if (nextStatus === enum_1.OrderStatus.PAID) {
+        else if (nextStatus === enum_1.OrderStatus.COMPLETED) {
             updateOrderDto.paymentAt = now;
         }
         return this.orderModel.findOneAndUpdate({

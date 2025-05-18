@@ -6,6 +6,10 @@ export class OrderItemDto {
   @IsNotEmpty({ message: 'items[index].sku không được bỏ trống' })
   sku: string
 
+  @IsMongoId({ message: 'items[index].productId phải là định dạng ObjectId' })
+  @IsNotEmpty({ message: 'items[index].productId không được bỏ trống' })
+  productId: string
+
   @Min(1, { message: 'items[index].quantity phải >= 1' })
   @IsNumber({ allowNaN: false }, { message: 'items[index].quantity phải là định dạng số' })
   @Transform(({ value }) => Number(value))

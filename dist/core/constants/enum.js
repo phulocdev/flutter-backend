@@ -26,14 +26,12 @@ var OrderStatus;
 (function (OrderStatus) {
     OrderStatus[OrderStatus["PROCESSING"] = 0] = "PROCESSING";
     OrderStatus[OrderStatus["PENDING_PAYMENT"] = 1] = "PENDING_PAYMENT";
-    OrderStatus[OrderStatus["PAID"] = 2] = "PAID";
-    OrderStatus[OrderStatus["PACKED"] = 3] = "PACKED";
-    OrderStatus[OrderStatus["SHIPPED"] = 4] = "SHIPPED";
-    OrderStatus[OrderStatus["READY_TO_SHIP"] = 5] = "READY_TO_SHIP";
-    OrderStatus[OrderStatus["COMPLETED"] = 6] = "COMPLETED";
+    OrderStatus[OrderStatus["PACKED"] = 2] = "PACKED";
+    OrderStatus[OrderStatus["SHIPPED"] = 3] = "SHIPPED";
+    OrderStatus[OrderStatus["DELIVERED"] = 4] = "DELIVERED";
+    OrderStatus[OrderStatus["COMPLETED"] = 5] = "COMPLETED";
+    OrderStatus[OrderStatus["RETURNED"] = 6] = "RETURNED";
     OrderStatus[OrderStatus["CANCELED"] = 7] = "CANCELED";
-    OrderStatus[OrderStatus["RETURNED"] = 8] = "RETURNED";
-    OrderStatus[OrderStatus["DELIVERED"] = 9] = "DELIVERED";
 })(OrderStatus || (exports.OrderStatus = OrderStatus = {}));
 exports.orderStatusOptions = Object.entries(OrderStatus)
     .filter(([_, value]) => !isNaN(Number(value)))

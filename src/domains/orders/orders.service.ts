@@ -13,7 +13,7 @@ import { OrderItem } from 'domains/orders/schemas/order-item.schema'
 import { Order } from 'domains/orders/schemas/order.schema'
 import { DecreaseStockOnHandDto } from 'domains/products/dto/decrease-stock-on-hand.dto'
 import { ProductsService } from 'domains/products/products.service'
-import mongoose, { FilterQuery, Model } from 'mongoose'
+import mongoose, { FilterQuery, Model, Types } from 'mongoose'
 
 @Injectable()
 export class OrdersService {
@@ -35,6 +35,12 @@ export class OrdersService {
       sku,
       quantity
     }))
+    const productsWithDecreaseQuantity: { productId: string; quantity: number }[] = items.map(
+      ({ productId, quantity }) => ({
+        productId,
+        quantity
+      })
+    )
 
     const session = await this.orderModel.db.startSession()
     try {
@@ -61,6 +67,7 @@ export class OrdersService {
 
       await session.commitTransaction()
       this.productsService.decreaseStockOnHand({ items: skusWithDecreaseQuantity })
+      this.productsService.increaseSoldQuantity(productsWithDecreaseQuantity)
 
       return createdOrder[0]
     } catch (error) {
@@ -72,47 +79,80 @@ export class OrdersService {
   }
 
   async findAll(qs: PaginationQueryDto & DateRangeQueryDto & OrderQueryDto) {
-    const { page, limit, from, to, sort: sortQuery } = qs
-    // sort và status là những query có gtri đặc biệt -> phải transform thành cú pháp hợp lệ trước khi mà thực hiện filter
-    // customerCode và tableNumber là query đặc biệt -> dùng để query nested Object
-    // Cho nên ta phải tasck 3 query value đó ra riêng
-
-    // Filter key of nested object
+    const {
+      page,
+      limit,
+      from,
+      to,
+      sort: sortQuery,
+      code,
+      userId,
+      status,
+      paymentMethod,
+      minTotalPrice,
+      maxTotalPrice,
+      minItemCount,
+      maxItemCount,
+      paymentFromDate,
+      paymentToDate,
+      deliveredFromDate,
+      deliveredToDate
+    } = qs
 
     const filter: FilterQuery<Order> = {}
-    // if (customerCode) {
-    //   const customerId = (await this.customersService.findByCode(customerCode))?._id
-    //   filter.customer = customerId
-    // }
 
-    // if (qs.customerId) {
-    //   filter.customer = new Types.ObjectId(qs.customerId)
-    // }
+    if (userId) {
+      filter.user = new Types.ObjectId(userId)
+    }
 
-    // if (status) {
-    //   filter.status = { $in: status }
-    // }
+    if (code) {
+      filter.code = { $regex: code, $options: 'i' }
+    }
 
-    // if (code) {
-    //   filter.code = { $regex: code, $options: 'i' }
-    // }
+    // must accept status 0 - Processing
+    if (status !== undefined) {
+      filter.status = status
+    }
 
-    // if (tableNumber) {
-    //   filter.tableNumber = { $in: tableNumber }
-    // }
+    if (paymentMethod) {
+      filter.paymentMethod = paymentMethod
+    }
 
-    // sort: createdAt.desc || createdAt.asc
-    let sort: Record<string, 1 | -1> = { createdAt: -1 }
-    if (sortQuery) {
-      const sortField = sortQuery.split('.')[0]
-      const isDescending = sortQuery.split('.')[1] === 'desc'
-      sort = isDescending ? { [sortField]: -1 } : { [sortField]: 1 }
+    if (minTotalPrice !== undefined || maxTotalPrice !== undefined) {
+      filter.totalPrice = {}
+      if (minTotalPrice !== undefined) filter.totalPrice.$gte = minTotalPrice
+      if (maxTotalPrice !== undefined) filter.totalPrice.$lte = maxTotalPrice
+    }
+
+    if (minItemCount !== undefined || maxItemCount !== undefined) {
+      filter.itemCount = {}
+      if (minItemCount !== undefined) filter.itemCount.$gte = minItemCount
+      if (maxItemCount !== undefined) filter.itemCount.$lte = maxItemCount
     }
 
     if (from || to) {
       filter.createdAt = {}
       if (from) filter.createdAt.$gte = from
       if (to) filter.createdAt.$lt = to
+    }
+
+    if (paymentFromDate || paymentToDate) {
+      filter.paymentAt = {}
+      if (paymentFromDate) filter.paymentAt.$gte = paymentFromDate
+      if (paymentToDate) filter.paymentAt.$lt = paymentToDate
+    }
+
+    if (deliveredFromDate || deliveredToDate) {
+      filter.deliveredAt = {}
+      if (deliveredFromDate) filter.deliveredAt.$gte = deliveredFromDate
+      if (deliveredToDate) filter.deliveredAt.$lt = deliveredToDate
+    }
+
+    let sort: Record<string, 1 | -1> = { createdAt: -1 }
+    if (sortQuery) {
+      const sortField = sortQuery.split('.')[0]
+      const isDescending = sortQuery.split('.')[1] === 'desc'
+      sort = isDescending ? { [sortField]: -1 } : { [sortField]: 1 }
     }
 
     const query = this.orderModel.find(filter).sort(sort)
@@ -158,15 +198,18 @@ export class OrdersService {
     }
   }
 
+  async findOrderDoc(id: string) {
+    return this.orderModel.findOne({ _id: id })
+  }
+
   async findOne(id: string) {
-    const orderItemList = await this.orderItemModel.find({ order: id }).lean(true)
+    const orderItemList = await this.orderItemModel.find({ order: new Types.ObjectId(id) }).lean(true)
     const skuIds = await orderItemList.map((orderItem) => orderItem.sku.toString())
 
     const skus: ISku[] = await this.productsService.findAllSkus(skuIds)
 
     const skuMap = new Map(skus.map((skuDocument) => [skuDocument._id.toString(), skuDocument]))
 
-    // Merge sku info into each item
     const enrichedItems = orderItemList.map((orderItem) => {
       const skuInfo = skuMap.get(orderItem.sku.toString())
       return {
@@ -192,7 +235,7 @@ export class OrdersService {
       updateOrderDto.deliveredAt = now
     } else if (nextStatus === OrderStatus.CANCELED) {
       updateOrderDto.cancelledAt = now
-    } else if (nextStatus === OrderStatus.PAID) {
+    } else if (nextStatus === OrderStatus.COMPLETED) {
       updateOrderDto.paymentAt = now
     }
 

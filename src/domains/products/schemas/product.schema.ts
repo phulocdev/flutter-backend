@@ -32,6 +32,12 @@ export class Product {
   @Prop({ required: false, type: String, enum: ProductStatus, default: ProductStatus.Published })
   status: ProductStatus
 
+  @Prop({ required: false, type: Number, default: 0 })
+  soldQuantity: number
+
+  @Prop({ required: false, type: Number, default: 0 })
+  discountPercentage: number
+
   @Prop({ required: true, type: Number })
   basePrice: number
 

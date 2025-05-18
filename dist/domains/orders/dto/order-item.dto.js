@@ -21,6 +21,11 @@ __decorate([
     __metadata("design:type", String)
 ], OrderItemDto.prototype, "sku", void 0);
 __decorate([
+    (0, class_validator_1.IsMongoId)({ message: 'items[index].productId phải là định dạng ObjectId' }),
+    (0, class_validator_1.IsNotEmpty)({ message: 'items[index].productId không được bỏ trống' }),
+    __metadata("design:type", String)
+], OrderItemDto.prototype, "productId", void 0);
+__decorate([
     (0, class_validator_1.Min)(1, { message: 'items[index].quantity phải >= 1' }),
     (0, class_validator_1.IsNumber)({ allowNaN: false }, { message: 'items[index].quantity phải là định dạng số' }),
     (0, class_transformer_1.Transform)(({ value }) => Number(value)),

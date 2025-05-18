@@ -76,6 +76,8 @@ export declare class ProductsController {
             imageUrl: string;
         }>;
         status: import("../../core/constants/enum").ProductStatus;
+        soldQuantity: number;
+        discountPercentage: number;
         basePrice: number;
         minStockLevel: number;
         maxStockLevel: number;
@@ -103,6 +105,8 @@ export declare class ProductsController {
             imageUrl: string;
         }>;
         status: import("../../core/constants/enum").ProductStatus;
+        soldQuantity: number;
+        discountPercentage: number;
         basePrice: number;
         minStockLevel: number;
         maxStockLevel: number;

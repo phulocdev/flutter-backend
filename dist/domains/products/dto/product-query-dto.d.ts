@@ -5,6 +5,7 @@ export declare class ProductQueryDto {
     name?: string;
     categoryIds?: string[];
     brandIds?: string[];
+    hasDiscount: number;
     status?: ProductStatus;
     minPrice?: number;
     maxPrice?: number;

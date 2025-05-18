@@ -59,6 +59,8 @@ export declare class ProductsService {
             imageUrl: string;
         }>;
         status: import("core/constants/enum").ProductStatus;
+        soldQuantity: number;
+        discountPercentage: number;
         basePrice: number;
         minStockLevel: number;
         maxStockLevel: number;
@@ -86,6 +88,8 @@ export declare class ProductsService {
             imageUrl: string;
         }>;
         status: import("core/constants/enum").ProductStatus;
+        soldQuantity: number;
+        discountPercentage: number;
         basePrice: number;
         minStockLevel: number;
         maxStockLevel: number;
@@ -105,6 +109,10 @@ export declare class ProductsService {
     }>;
     increaseStockOnHand(increaseStockOnHandDto: IncreaseStockOnHandDto): void;
     decreaseStockOnHand(decreaseStockOnHandDto: DecreaseStockOnHandDto): void;
+    increaseSoldQuantity(items: {
+        productId: string;
+        quantity: number;
+    }[]): void;
     findOneSku(skuId: string): Promise<mongoose.Document<unknown, {}, Sku> & Sku & {
         _id: Types.ObjectId;
     } & {
