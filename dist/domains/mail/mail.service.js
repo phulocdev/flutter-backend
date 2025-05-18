@@ -13,6 +13,7 @@ exports.MailService = void 0;
 const mailer_1 = require("@nestjs-modules/mailer");
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
+const utils_1 = require("../../core/utils/utils");
 let MailService = exports.MailService = class MailService {
     constructor(mailerService, configService) {
         this.mailerService = mailerService;
@@ -27,6 +28,33 @@ let MailService = exports.MailService = class MailService {
             context: {
                 userEmail: email,
                 otpCode
+            }
+        });
+    }
+    async sendOrderConfirmation(order) {
+        const { totalPrice, discountAmount, code, shippingInfo } = order;
+        const { address, phoneNumber, name, email } = shippingInfo;
+        await this.mailerService.sendMail({
+            to: email,
+            from: 'Flutter Ecommerce',
+            subject: `Xác nhận đặt hàng thành công | ${code}`,
+            template: './order-confirmation',
+            context: {
+                username: name,
+                orderUrl: ``,
+                items: [],
+                discount: discountAmount,
+                totalAmount: (0, utils_1.formatNumberToVND)(totalPrice),
+                shippingFee: (0, utils_1.formatNumberToVND)(26000),
+                totalAmountWithShippingFee: (0, utils_1.formatNumberToVND)(totalPrice + 26000),
+                detailedAddress: address,
+                ward: '',
+                district: '',
+                province: '',
+                phoneNumber,
+                paymentMethod: 'Thanh toán khi nhận hàng(COD)',
+                shippingMethod: 'Vận chuyển nhanh',
+                orderStatus: 'Đã xác nhận'
             }
         });
     }

@@ -1,5 +1,6 @@
 import { ValidationError } from 'class-validator';
 export declare const extractErrorMessageFromDto: (errors: ValidationError[]) => string[];
+export declare const formatNumberToVND: (price: number) => string;
 export declare const createMediaUrl: ({ baseUrl, filename, folderName }: {
     baseUrl: string;
     folderName?: string;

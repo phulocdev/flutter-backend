@@ -1,6 +1,7 @@
 import { DateRangeQueryDto } from 'core/query-string-dtos/date-range-query.dto';
 import { PaginationQueryDto } from 'core/query-string-dtos/pagination-query.dto';
 import { AccountType, ISku } from 'core/types/type';
+import { MailService } from 'domains/mail/mail.service';
 import { CreateOrderDto } from 'domains/orders/dto/create-order.dto';
 import { OrderQueryDto } from 'domains/orders/dto/order-query.dto';
 import { UpdateOrderDto } from 'domains/orders/dto/update-order.dto';
@@ -11,8 +12,9 @@ import mongoose, { Model, Types } from 'mongoose';
 export declare class OrdersService {
     private readonly orderModel;
     private readonly orderItemModel;
+    private mailService;
     private readonly productsService;
-    constructor(orderModel: Model<Order>, orderItemModel: Model<OrderItem>, productsService: ProductsService);
+    constructor(orderModel: Model<Order>, orderItemModel: Model<OrderItem>, mailService: MailService, productsService: ProductsService);
     create(createOrderDto: CreateOrderDto): Promise<mongoose.Document<unknown, {}, Order> & Order & Required<{
         _id: Types.ObjectId;
     }> & {

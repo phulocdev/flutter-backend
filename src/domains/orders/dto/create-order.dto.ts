@@ -39,7 +39,7 @@ export class CreateOrderDto {
   @IsNotEmpty({ message: 'totalPrice không được bỏ trống' })
   totalPrice: number
 
-  @Min(1, { message: 'totalPrice phải >= 1' })
+  @Min(0, { message: 'totalPrice phải >= 1' })
   @IsNumber({ allowNaN: false }, { message: 'totalPrice phải là định dạng số' })
   @Transform(({ value }) => Number(value))
   @IsOptional({ message: 'totalPrice không được bỏ trống' })

@@ -41,14 +41,16 @@ const mongoose_1 = require("@nestjs/mongoose");
 const enum_1 = require("../../core/constants/enum");
 const errors_exception_1 = require("../../core/exceptions/errors.exception");
 const utils_1 = require("../../core/utils/utils");
+const mail_service_1 = require("../mail/mail.service");
 const order_item_schema_1 = require("./schemas/order-item.schema");
 const order_schema_1 = require("./schemas/order.schema");
 const products_service_1 = require("../products/products.service");
 const mongoose_2 = __importStar(require("mongoose"));
 let OrdersService = exports.OrdersService = class OrdersService {
-    constructor(orderModel, orderItemModel, productsService) {
+    constructor(orderModel, orderItemModel, mailService, productsService) {
         this.orderModel = orderModel;
         this.orderItemModel = orderItemModel;
+        this.mailService = mailService;
         this.productsService = productsService;
     }
     async create(createOrderDto) {
@@ -81,6 +83,7 @@ let OrdersService = exports.OrdersService = class OrdersService {
             await session.commitTransaction();
             this.productsService.decreaseStockOnHand({ items: skusWithDecreaseQuantity });
             this.productsService.increaseSoldQuantity(productsWithDecreaseQuantity);
+            this.mailService.sendOrderConfirmation(createdOrder[0]);
             return createdOrder[0];
         }
         catch (error) {
@@ -235,6 +238,7 @@ exports.OrdersService = OrdersService = __decorate([
     __param(1, (0, mongoose_1.InjectModel)(order_item_schema_1.OrderItem.name)),
     __metadata("design:paramtypes", [mongoose_2.Model,
         mongoose_2.Model,
+        mail_service_1.MailService,
         products_service_1.ProductsService])
 ], OrdersService);
 //# sourceMappingURL=orders.service.js.map

@@ -6,6 +6,7 @@ import { DateRangeQueryDto } from 'core/query-string-dtos/date-range-query.dto'
 import { PaginationQueryDto } from 'core/query-string-dtos/pagination-query.dto'
 import { AccountType, ISku } from 'core/types/type'
 import { generateOrderCode } from 'core/utils/utils'
+import { MailService } from 'domains/mail/mail.service'
 import { CreateOrderDto } from 'domains/orders/dto/create-order.dto'
 import { OrderQueryDto } from 'domains/orders/dto/order-query.dto'
 import { UpdateOrderDto } from 'domains/orders/dto/update-order.dto'
@@ -20,6 +21,7 @@ export class OrdersService {
   constructor(
     @InjectModel(Order.name) private readonly orderModel: Model<Order>,
     @InjectModel(OrderItem.name) private readonly orderItemModel: Model<OrderItem>,
+    private mailService: MailService,
     private readonly productsService: ProductsService
   ) {}
 
@@ -68,6 +70,7 @@ export class OrdersService {
       await session.commitTransaction()
       this.productsService.decreaseStockOnHand({ items: skusWithDecreaseQuantity })
       this.productsService.increaseSoldQuantity(productsWithDecreaseQuantity)
+      this.mailService.sendOrderConfirmation(createdOrder[0])
 
       return createdOrder[0]
     } catch (error) {

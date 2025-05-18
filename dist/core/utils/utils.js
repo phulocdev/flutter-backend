@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateSkuCode = exports.generateCustomerCode = exports.generateOrderCode = exports.generateProductCode = exports.createMediaUrl = exports.extractErrorMessageFromDto = void 0;
+exports.generateSkuCode = exports.generateCustomerCode = exports.generateOrderCode = exports.generateProductCode = exports.createMediaUrl = exports.formatNumberToVND = exports.extractErrorMessageFromDto = void 0;
 const nanoid_1 = require("nanoid");
 const extractErrorMessageFromDto = (errors) => {
     const messages = [];
@@ -15,6 +15,10 @@ const extractErrorMessageFromDto = (errors) => {
     return messages;
 };
 exports.extractErrorMessageFromDto = extractErrorMessageFromDto;
+const formatNumberToVND = (price) => {
+    return new Intl.NumberFormat().format(price) + ' VNĐ';
+};
+exports.formatNumberToVND = formatNumberToVND;
 const createMediaUrl = ({ baseUrl, filename, folderName = 'tmp' }) => {
     return `${baseUrl}/public/${folderName}/${filename}`;
 };

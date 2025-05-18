@@ -16,6 +16,10 @@ export const extractErrorMessageFromDto = (errors: ValidationError[]): string[] 
   return messages
 }
 
+export const formatNumberToVND = (price: number) => {
+  return new Intl.NumberFormat().format(price) + ' VNĐ'
+}
+
 export const createMediaUrl = ({
   baseUrl,
   filename,

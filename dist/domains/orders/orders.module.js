@@ -14,6 +14,7 @@ const mongoose_1 = require("@nestjs/mongoose");
 const order_schema_1 = require("./schemas/order.schema");
 const order_item_schema_1 = require("./schemas/order-item.schema");
 const products_module_1 = require("../products/products.module");
+const mail_service_1 = require("../mail/mail.service");
 let OrdersModule = exports.OrdersModule = class OrdersModule {
 };
 exports.OrdersModule = OrdersModule = __decorate([
@@ -26,7 +27,7 @@ exports.OrdersModule = OrdersModule = __decorate([
             products_module_1.ProductsModule
         ],
         controllers: [orders_controller_1.OrdersController],
-        providers: [orders_service_1.OrdersService],
+        providers: [orders_service_1.OrdersService, mail_service_1.MailService],
         exports: [orders_service_1.OrdersService]
     })
 ], OrdersModule);
