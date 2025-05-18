@@ -27,7 +27,7 @@ __decorate([
     __metadata("design:type", String)
 ], Account.prototype, "fullName", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: false, default: '', type: String, unique: true }),
+    (0, mongoose_1.Prop)({ required: false, default: '', type: String, unique: false }),
     __metadata("design:type", String)
 ], Account.prototype, "phoneNumber", void 0);
 __decorate([

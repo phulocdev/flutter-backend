@@ -31,7 +31,7 @@ export class Account {
   @Prop({ required: false, type: String, default: '' })
   fullName: string
 
-  @Prop({ required: false, default: '', type: String, unique: true })
+  @Prop({ required: false, default: '', type: String, unique: false })
   phoneNumber: string
 
   @Prop({ required: false, type: Boolean, default: false })
