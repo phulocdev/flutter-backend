@@ -31,6 +31,9 @@ let LocalEmployeeStrategy = exports.LocalEmployeeStrategy = class LocalEmployeeS
         if (!account) {
             throw new errors_exception_1.UnprocessableEntityError([{ field: 'password', message: 'Email/Password không tồn tại trên hệ thống' }]);
         }
+        if (!account.isActive) {
+            throw new errors_exception_1.UnprocessableEntityError([{ field: 'password', message: 'Tài khoản đã bị khóa!' }]);
+        }
         return {
             _id: account._id.toString(),
             avatarUrl: account.avatarUrl,

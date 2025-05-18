@@ -26,6 +26,10 @@ export class LocalEmployeeStrategy extends PassportStrategy(Strategy, 'local') {
       throw new UnprocessableEntityError([{ field: 'password', message: 'Email/Password không tồn tại trên hệ thống' }])
     }
 
+    if (!account.isActive) {
+      throw new UnprocessableEntityError([{ field: 'password', message: 'Tài khoản đã bị khóa!' }])
+    }
+
     // Gán vào req.user
     return {
       _id: account._id.toString(),
