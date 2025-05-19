@@ -5,7 +5,7 @@ import { BadRequestError, NotFoundError, UnprocessableEntityError } from 'core/e
 import { PaginationQueryDto } from 'core/query-string-dtos/pagination-query.dto'
 import { AccountQueryDto } from 'domains/accounts/dto/account-query.dto'
 import { Account, AccountDocument } from 'domains/accounts/schemas/account.schema'
-import mongoose, { Model } from 'mongoose'
+import mongoose, { FilterQuery, Model } from 'mongoose'
 import { CreateAccountDto } from './dto/create-account.dto'
 import { UpdateAccountDto } from './dto/update-account.dto'
 import { CreateGuestAccountDto } from 'domains/accounts/dto/create-account-guest.dto'
@@ -64,7 +64,27 @@ export class AccountsService {
   }
 
   async findAll(qs: PaginationQueryDto & AccountQueryDto) {
-    const { page, limit, sort: sortQuery, ...filter } = qs
+    const { page, limit, sort: sortQuery, email, fullName, isActive, role } = qs
+
+    const filter: FilterQuery<Account> = {}
+
+    if (email) {
+      filter.email = email
+    }
+
+    if (fullName) {
+      filter.fullName = { $regex: fullName, $options: 'i' }
+    }
+
+    if (isActive) {
+      filter.isActive = true
+    } else if (isActive === 0) {
+      filter.isActive = false
+    }
+
+    if (role) {
+      filter.role = role
+    }
 
     // sort: createdAt.desc || createdAt.asc
     let sort: Record<string, 1 | -1> = { createdAt: -1 }
@@ -73,12 +93,6 @@ export class AccountsService {
       const isDescending = sortQuery.split('.')[1] === 'desc'
       sort = isDescending ? { [sortField]: -1 } : { [sortField]: 1 }
     }
-
-    // if (from || to) {
-    //   filter.createdAt = {}
-    //   if (from) filter.createdAt.$gte = from
-    //   if (to) filter.createdAt.$lt = to
-    // }
 
     const query = this.accountModel.find(filter).sort(sort)
 

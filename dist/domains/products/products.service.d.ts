@@ -104,9 +104,6 @@ export declare class ProductsService {
     remove(_id: string): Promise<{
         deleted: boolean;
     }>;
-    bulkRemove(ids: string[]): Promise<{
-        deleted: boolean;
-    }>;
     increaseStockOnHand(increaseStockOnHandDto: IncreaseStockOnHandDto): void;
     decreaseStockOnHand(decreaseStockOnHandDto: DecreaseStockOnHandDto): void;
     increaseSoldQuantity(items: {

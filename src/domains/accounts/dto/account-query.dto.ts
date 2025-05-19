@@ -1,22 +1,39 @@
 import { Type } from 'class-transformer'
-import { IsOptional, IsString, MinLength } from 'class-validator'
-
+import { IsBoolean, IsEmail, IsEnum, IsInt, IsOptional, IsString, Max, Min, MinLength } from 'class-validator'
+import { Role } from 'core/constants/enum'
 export class AccountQueryDto {
-  @MinLength(5, { message: 'sort phải có ít nhất 5 ký tự' })
   @IsString({ message: 'sort phải là định dạng chuỗi' })
-  @Type(() => String)
   @IsOptional()
-  sort?: string | undefined
+  @Type(() => String)
+  sort?: string
 
-  @MinLength(1, { message: 'code phải có ít nhất 1 ký tự' })
-  @IsString({ message: 'code phải là định dạng chuỗi' })
-  @Type(() => String)
+  @IsString({ message: 'email phải là định dạng chuỗi' })
   @IsOptional()
-  code?: string | undefined
+  @Type(() => String)
+  email?: string
 
-  @MinLength(1, { message: 'customerCode phải có ít nhất 1 ký tự' })
-  @IsString({ message: 'customerCode phải là định dạng chuỗi' })
-  @Type(() => String)
+  @IsString({ message: 'fullName phải là định dạng chuỗi' })
   @IsOptional()
-  customerCode?: string | undefined
+  @Type(() => String)
+  fullName?: string
+
+  @IsString({ message: 'phoneNumber phải là định dạng chuỗi' })
+  @IsOptional()
+  @Type(() => String)
+  phoneNumber?: string
+
+  @IsInt({ message: 'isActive phải là 0 || 1' })
+  @IsOptional()
+  @Type(() => Number)
+  isActive?: number
+
+  @IsString({ message: 'address phải là định dạng chuỗi' })
+  @IsOptional()
+  @Type(() => String)
+  address?: string
+
+  @IsEnum(Role, { message: 'role phải là một trong các giá trị hợp lệ của Role' })
+  @IsOptional()
+  @Type(() => String)
+  role?: Role
 }

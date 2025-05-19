@@ -123,6 +123,9 @@ let ProductsService = exports.ProductsService = class ProductsService {
     async findAll(qs) {
         const { page, limit, from, to, sort: sortQuery, name, brandIds, categoryIds, code, hasDiscount, maxPrice, minPrice, status } = qs;
         const filter = {};
+        if (status !== undefined) {
+            filter.status = status;
+        }
         if (name) {
             filter.name = { $regex: name, $options: 'i' };
         }
@@ -207,6 +210,21 @@ let ProductsService = exports.ProductsService = class ProductsService {
             },
             {
                 $facet: {
+                    attributeOptions: [
+                        {
+                            $group: {
+                                _id: '$attributeInfo.name',
+                                values: { $addToSet: '$value' }
+                            }
+                        },
+                        {
+                            $project: {
+                                _id: 0,
+                                name: '$_id',
+                                values: 1
+                            }
+                        }
+                    ],
                     variants: [
                         {
                             $group: {
@@ -281,123 +299,133 @@ let ProductsService = exports.ProductsService = class ProductsService {
         if (!attributeNames && skus) {
             throw new errors_exception_1.UnprocessableEntityError([{ field: 'attributeNames', message: 'attributeNames không được bỏ trống' }]);
         }
-        const session = await this.productModel.db.startSession();
-        try {
-            session.startTransaction();
-            if (!attributeNames || !skus) {
+        const MAX_RETRIES = 3;
+        let retryCount = 0;
+        while (retryCount < MAX_RETRIES) {
+            const session = await this.productModel.db.startSession();
+            try {
+                session.startTransaction({
+                    readConcern: { level: 'snapshot' },
+                    writeConcern: { w: 'majority' },
+                    maxCommitTimeMS: 10000
+                });
+                if (!attributeNames || !skus) {
+                    const updatedProduct = await this.productModel.findOneAndUpdate({ _id }, baseProductDto, {
+                        new: true,
+                        session
+                    });
+                    await session.commitTransaction();
+                    return updatedProduct;
+                }
+                const productAttributes = await this.productAttributeModel.find({ product: _id });
+                const productAttributeIds = productAttributes.map((prodAtt) => prodAtt._id);
+                await Promise.all([
+                    this.productAttributeModel.deleteMany({ product: _id }).session(session),
+                    this.productAttributeSkuModel.deleteMany({ productAttribute: { $in: productAttributeIds } }).session(session),
+                    this.skuModel.deleteMany({ product: _id }).session(session)
+                ]);
+                let attributeDocuments = [];
+                let skuDocuments = [];
+                if (attributeNames.length > 0) {
+                    attributeDocuments = await this.productAttributeModel.insertMany(attributeNames.map((name) => ({ product: _id, name })), { session });
+                }
+                if (skus.length > 0) {
+                    skuDocuments = await this.skuModel.insertMany(skus.map((sku) => {
+                        const { attributeValues, ...skuFieldValues } = sku;
+                        return {
+                            ...skuFieldValues,
+                            product: _id,
+                            barcode: (0, utils_1.generateSkuCode)(),
+                            sku: (0, utils_1.generateSkuCode)()
+                        };
+                    }), { session });
+                }
+                if (attributeDocuments.length > 0 && skuDocuments.length > 0) {
+                    const attributeNameToIdMap = new Map();
+                    attributeDocuments.forEach((attr, index) => {
+                        attributeNameToIdMap.set(attributeNames[index], attr._id);
+                    });
+                    const productAttributeSkuOperations = [];
+                    skus.forEach((sku, skuIndex) => {
+                        if (sku.attributeValues && sku.attributeValues.length === attributeNames.length) {
+                            sku.attributeValues.forEach((attributeValue, attrIndex) => {
+                                const attributeName = attributeNames[attrIndex];
+                                const attributeId = attributeNameToIdMap.get(attributeName);
+                                productAttributeSkuOperations.push({
+                                    insertOne: {
+                                        document: {
+                                            productAttribute: attributeId,
+                                            sku: skuDocuments[skuIndex]._id,
+                                            value: attributeValue
+                                        }
+                                    }
+                                });
+                            });
+                        }
+                        else {
+                            throw new errors_exception_1.BadRequestError(`SKU at index ${skuIndex} has invalid attribute values count. Expected ${attributeNames.length}, got ${sku.attributeValues?.length || 0}`);
+                        }
+                    });
+                    if (productAttributeSkuOperations.length > 0) {
+                        await this.productAttributeSkuModel.bulkWrite(productAttributeSkuOperations, { session });
+                    }
+                }
                 const updatedProduct = await this.productModel.findOneAndUpdate({ _id }, baseProductDto, { new: true, session });
                 await session.commitTransaction();
+                session.endSession();
                 return updatedProduct;
             }
-            const productAttributes = await this.productAttributeModel.find({ product: _id });
-            const productAttributeIds = productAttributes.map((prodAtt) => prodAtt._id);
-            await Promise.all([
-                this.productAttributeModel.deleteMany({ product: _id }).session(session),
-                this.productAttributeSkuModel.deleteMany({ productAttribute: { $in: productAttributeIds } }).session(session),
-                this.skuModel.deleteMany({ product: _id }).session(session)
-            ]);
-            let attributeDocuments = [];
-            let skuDocuments = [];
-            if (attributeNames.length > 0) {
-                attributeDocuments = await this.productAttributeModel.insertMany(attributeNames.map((name) => ({ product: _id, name })), { session });
-            }
-            if (skus.length > 0) {
-                skuDocuments = await this.skuModel.insertMany(skus.map((sku) => {
-                    const { attributeValues, ...skuFieldValues } = sku;
-                    return {
-                        ...skuFieldValues,
-                        product: _id,
-                        barcode: (0, utils_1.generateSkuCode)(),
-                        sku: (0, utils_1.generateSkuCode)()
-                    };
-                }), { session });
-            }
-            if (attributeDocuments.length > 0 && skuDocuments.length > 0) {
-                const attributeNameToIdMap = new Map();
-                attributeDocuments.forEach((attr, index) => {
-                    attributeNameToIdMap.set(attributeNames[index], attr._id);
-                });
-                const productAttributeSkuOperations = [];
-                skus.forEach((sku, skuIndex) => {
-                    if (sku.attributeValues && sku.attributeValues.length === attributeNames.length) {
-                        sku.attributeValues.forEach((attributeValue, attrIndex) => {
-                            const attributeName = attributeNames[attrIndex];
-                            const attributeId = attributeNameToIdMap.get(attributeName);
-                            productAttributeSkuOperations.push({
-                                insertOne: {
-                                    document: {
-                                        productAttribute: attributeId,
-                                        sku: skuDocuments[skuIndex]._id,
-                                        value: attributeValue
-                                    }
-                                }
-                            });
-                        });
-                    }
-                    else {
-                        throw new errors_exception_1.BadRequestError(`SKU at index ${skuIndex} has invalid attribute values count. Expected ${attributeNames.length}, got ${sku.attributeValues?.length || 0}`);
-                    }
-                });
-                if (productAttributeSkuOperations.length > 0) {
-                    await this.productAttributeSkuModel.bulkWrite(productAttributeSkuOperations, { session });
+            catch (error) {
+                await session.abortTransaction();
+                session.endSession();
+                if (error.errorLabels &&
+                    error.errorLabels.includes('TransientTransactionError') &&
+                    retryCount < MAX_RETRIES - 1) {
+                    retryCount++;
+                    console.log(`Transaction failed with transient error, retrying (${retryCount}/${MAX_RETRIES})...`);
+                    await new Promise((resolve) => setTimeout(resolve, 100 * Math.pow(2, retryCount)));
+                    continue;
                 }
+                throw error;
             }
-            const updatedProduct = await this.productModel.findOneAndUpdate({ _id }, baseProductDto, { new: true, session });
-            await session.commitTransaction();
-            return updatedProduct;
-        }
-        catch (error) {
-            await session.abortTransaction();
-            throw error;
-        }
-        finally {
-            session.endSession();
         }
     }
     async remove(_id) {
-        const session = await this.productModel.db.startSession();
-        try {
-            session.startTransaction();
-            const productAttributes = await this.productAttributeModel.find({ product: _id });
-            const productAttributeIds = productAttributes.map((prodAtt) => prodAtt._id);
-            await Promise.all([
-                this.productModel.deleteOne({ _id }).session(session),
-                this.productAttributeModel.deleteMany({ product: _id }).session(session),
-                this.productAttributeSkuModel.deleteMany({ productAttribute: { $in: productAttributeIds } }).session(session),
-                this.skuModel.deleteMany({ product: _id }).session(session)
-            ]);
-            await session.commitTransaction();
-            return { deleted: true };
-        }
-        catch (error) {
-            await session.abortTransaction();
-            throw error;
-        }
-        finally {
-            session.endSession();
-        }
-    }
-    async bulkRemove(ids) {
-        const session = await this.productModel.db.startSession();
-        try {
-            session.startTransaction();
-            const productAttributes = await this.productAttributeModel.find({ product: { $in: ids } });
-            const productAttributeIds = productAttributes.map((prodAtt) => prodAtt._id);
-            await Promise.all([
-                this.productModel.deleteMany({ _id: { $in: ids } }).session(session),
-                this.productAttributeModel.deleteMany({ product: { $in: ids } }).session(session),
-                this.productAttributeSkuModel.deleteMany({ productAttribute: { $in: productAttributeIds } }).session(session),
-                this.skuModel.deleteMany({ product: { $in: ids } }).session(session)
-            ]);
-            await session.commitTransaction();
-            return { deleted: true };
-        }
-        catch (error) {
-            await session.abortTransaction();
-            throw error;
-        }
-        finally {
-            session.endSession();
+        const MAX_RETRIES = 3;
+        let retryCount = 0;
+        while (retryCount < MAX_RETRIES) {
+            const session = await this.productModel.db.startSession();
+            try {
+                session.startTransaction({
+                    readConcern: { level: 'snapshot' },
+                    writeConcern: { w: 'majority' },
+                    maxCommitTimeMS: 10000
+                });
+                const productAttributes = await this.productAttributeModel.find({ product: _id });
+                const productAttributeIds = productAttributes.map((prodAtt) => prodAtt._id);
+                await Promise.all([
+                    this.productModel.deleteOne({ _id }).session(session),
+                    this.productAttributeModel.deleteMany({ product: _id }).session(session),
+                    this.productAttributeSkuModel.deleteMany({ productAttribute: { $in: productAttributeIds } }).session(session),
+                    this.skuModel.deleteMany({ product: _id }).session(session)
+                ]);
+                await session.commitTransaction();
+                session.endSession();
+                return { deleted: true };
+            }
+            catch (error) {
+                await session.abortTransaction();
+                session.endSession();
+                if (error.errorLabels &&
+                    error.errorLabels.includes('TransientTransactionError') &&
+                    retryCount < MAX_RETRIES - 1) {
+                    retryCount++;
+                    console.log(`Transaction failed with transient error, retrying (${retryCount}/${MAX_RETRIES})...`);
+                    await new Promise((resolve) => setTimeout(resolve, 100 * Math.pow(2, retryCount)));
+                    continue;
+                }
+                throw error;
+            }
         }
     }
     increaseStockOnHand(increaseStockOnHandDto) {

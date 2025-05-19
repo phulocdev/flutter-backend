@@ -150,14 +150,15 @@ export class ProductsService {
     //   filter.customer = new Types.ObjectId(qs.customerId)
     // }
 
-    // if (status) {
-    //   filter.status = { $in: status }
-    // }
+    if (status !== undefined) {
+      filter.status = status
+    }
 
     if (name) {
       filter.name = { $regex: name, $options: 'i' }
     }
 
+    // 0 || 1
     if (hasDiscount) {
       filter.discountPercentage = { $gte: 0 }
     }
@@ -260,21 +261,21 @@ export class ProductsService {
       {
         $facet: {
           // Format attributeOptions to: { name: string, values: string[] }
-          // attributeOptions: [
-          //   {
-          //     $group: {
-          //       _id: '$attributeInfo.name',
-          //       values: { $addToSet: '$value' }
-          //     }
-          //   },
-          //   {
-          //     $project: {
-          //       _id: 0,
-          //       name: '$_id',
-          //       values: 1
-          //     }
-          //   }
-          // ],
+          attributeOptions: [
+            {
+              $group: {
+                _id: '$attributeInfo.name',
+                values: { $addToSet: '$value' }
+              }
+            },
+            {
+              $project: {
+                _id: 0,
+                name: '$_id',
+                values: 1
+              }
+            }
+          ],
 
           // Format variants.skus[n].attributes to: { name: string, values: string[] }
           variants: [
@@ -358,155 +359,181 @@ export class ProductsService {
       throw new UnprocessableEntityError([{ field: 'attributeNames', message: 'attributeNames không được bỏ trống' }])
     }
 
-    const session = await this.productModel.db.startSession()
-    try {
-      session.startTransaction()
+    // Add retry logic for TransientTransactionError
+    const MAX_RETRIES = 3
+    let retryCount = 0
 
-      // TH1: Không cập nhật liên quan đến biến thể
-      if (!attributeNames || !skus) {
-        const updatedProduct = await this.productModel.findOneAndUpdate({ _id }, baseProductDto, { new: true, session })
-        await session.commitTransaction()
-        return updatedProduct
-      }
+    while (retryCount < MAX_RETRIES) {
+      const session = await this.productModel.db.startSession()
 
-      // TH2: Không cập nhật các biến thể của sản phẩm
-      // 1. Find and remove related records
-      const productAttributes = await this.productAttributeModel.find({ product: _id })
-      const productAttributeIds = productAttributes.map((prodAtt) => prodAtt._id)
-
-      await Promise.all([
-        this.productAttributeModel.deleteMany({ product: _id }).session(session),
-        this.productAttributeSkuModel.deleteMany({ productAttribute: { $in: productAttributeIds } }).session(session),
-        this.skuModel.deleteMany({ product: _id }).session(session)
-      ])
-
-      // 2. Create new attributes and SKUs
-      let attributeDocuments: Array<any> = []
-      let skuDocuments: Array<any> = []
-
-      if (attributeNames.length > 0) {
-        attributeDocuments = await this.productAttributeModel.insertMany(
-          attributeNames.map((name) => ({ product: _id, name })),
-          { session }
-        )
-      }
-
-      if (skus.length > 0) {
-        skuDocuments = await this.skuModel.insertMany(
-          skus.map((sku) => {
-            const { attributeValues, ...skuFieldValues } = sku
-            return {
-              ...skuFieldValues,
-              product: _id,
-              barcode: generateSkuCode(),
-              sku: generateSkuCode()
-            }
-          }),
-          { session }
-        )
-      }
-
-      // 3. Create mapping between attributes and SKUs using a defined structure
-      if (attributeDocuments.length > 0 && skuDocuments.length > 0) {
-        const attributeNameToIdMap = new Map<string, mongoose.Types.ObjectId>()
-        attributeDocuments.forEach((attr, index) => {
-          attributeNameToIdMap.set(attributeNames[index], attr._id)
+      try {
+        session.startTransaction({
+          readConcern: { level: 'snapshot' },
+          writeConcern: { w: 'majority' },
+          maxCommitTimeMS: 10000 // Set appropriate timeout
         })
 
-        const productAttributeSkuOperations: Array<any> = []
-
-        skus.forEach((sku, skuIndex) => {
-          if (sku.attributeValues && sku.attributeValues.length === attributeNames.length) {
-            sku.attributeValues.forEach((attributeValue, attrIndex) => {
-              const attributeName = attributeNames[attrIndex]
-              const attributeId = attributeNameToIdMap.get(attributeName)
-
-              productAttributeSkuOperations.push({
-                insertOne: {
-                  document: {
-                    productAttribute: attributeId,
-                    sku: skuDocuments[skuIndex]._id,
-                    value: attributeValue
-                  }
-                }
-              })
-            })
-          } else {
-            throw new BadRequestError(
-              `SKU at index ${skuIndex} has invalid attribute values count. Expected ${attributeNames.length}, got ${
-                sku.attributeValues?.length || 0
-              }`
-            )
-          }
-        })
-
-        if (productAttributeSkuOperations.length > 0) {
-          await this.productAttributeSkuModel.bulkWrite(productAttributeSkuOperations, { session })
+        // TH1: Không cập nhật liên quan đến biến thể
+        if (!attributeNames || !skus) {
+          const updatedProduct = await this.productModel.findOneAndUpdate({ _id }, baseProductDto, {
+            new: true,
+            session
+          })
+          await session.commitTransaction()
+          return updatedProduct
         }
+
+        // TH2: Cập nhật các biến thể của sản phẩm
+        // 1. Find and remove related records
+        const productAttributes = await this.productAttributeModel.find({ product: _id })
+        const productAttributeIds = productAttributes.map((prodAtt) => prodAtt._id)
+
+        await Promise.all([
+          this.productAttributeModel.deleteMany({ product: _id }).session(session),
+          this.productAttributeSkuModel.deleteMany({ productAttribute: { $in: productAttributeIds } }).session(session),
+          this.skuModel.deleteMany({ product: _id }).session(session)
+        ])
+
+        // 2. Create new attributes and SKUs
+        let attributeDocuments: Array<any> = []
+        let skuDocuments: Array<any> = []
+
+        if (attributeNames.length > 0) {
+          attributeDocuments = await this.productAttributeModel.insertMany(
+            attributeNames.map((name) => ({ product: _id, name })),
+            { session }
+          )
+        }
+
+        if (skus.length > 0) {
+          skuDocuments = await this.skuModel.insertMany(
+            skus.map((sku) => {
+              const { attributeValues, ...skuFieldValues } = sku
+              return {
+                ...skuFieldValues,
+                product: _id,
+                barcode: generateSkuCode(),
+                sku: generateSkuCode()
+              }
+            }),
+            { session }
+          )
+        }
+
+        // 3. Create mapping between attributes and SKUs
+        if (attributeDocuments.length > 0 && skuDocuments.length > 0) {
+          const attributeNameToIdMap = new Map<string, mongoose.Types.ObjectId>()
+          attributeDocuments.forEach((attr, index) => {
+            attributeNameToIdMap.set(attributeNames[index], attr._id)
+          })
+
+          const productAttributeSkuOperations: Array<any> = []
+
+          skus.forEach((sku, skuIndex) => {
+            if (sku.attributeValues && sku.attributeValues.length === attributeNames.length) {
+              sku.attributeValues.forEach((attributeValue, attrIndex) => {
+                const attributeName = attributeNames[attrIndex]
+                const attributeId = attributeNameToIdMap.get(attributeName)
+
+                productAttributeSkuOperations.push({
+                  insertOne: {
+                    document: {
+                      productAttribute: attributeId,
+                      sku: skuDocuments[skuIndex]._id,
+                      value: attributeValue
+                    }
+                  }
+                })
+              })
+            } else {
+              throw new BadRequestError(
+                `SKU at index ${skuIndex} has invalid attribute values count. Expected ${attributeNames.length}, got ${
+                  sku.attributeValues?.length || 0
+                }`
+              )
+            }
+          })
+
+          if (productAttributeSkuOperations.length > 0) {
+            await this.productAttributeSkuModel.bulkWrite(productAttributeSkuOperations, { session })
+          }
+        }
+
+        // 4. Update the base product
+        const updatedProduct = await this.productModel.findOneAndUpdate({ _id }, baseProductDto, { new: true, session })
+
+        await session.commitTransaction()
+        session.endSession()
+        return updatedProduct
+      } catch (error) {
+        await session.abortTransaction()
+        session.endSession()
+
+        // Check if it's a transient transaction error that we should retry
+        if (
+          (error as any).errorLabels &&
+          (error as any).errorLabels.includes('TransientTransactionError') &&
+          retryCount < MAX_RETRIES - 1
+        ) {
+          retryCount++
+          console.log(`Transaction failed with transient error, retrying (${retryCount}/${MAX_RETRIES})...`)
+          // Add a small delay before retrying
+          await new Promise((resolve) => setTimeout(resolve, 100 * Math.pow(2, retryCount)))
+          continue
+        }
+
+        throw error
       }
-
-      // 4. Update the base product
-      const updatedProduct = await this.productModel.findOneAndUpdate({ _id }, baseProductDto, { new: true, session })
-
-      await session.commitTransaction()
-      return updatedProduct
-    } catch (error) {
-      await session.abortTransaction()
-      throw error
-    } finally {
-      session.endSession()
     }
   }
 
   async remove(_id: string) {
-    const session = await this.productModel.db.startSession()
-    try {
-      session.startTransaction()
+    const MAX_RETRIES = 3
+    let retryCount = 0
 
-      // Find related records to delete
-      const productAttributes = await this.productAttributeModel.find({ product: _id })
-      const productAttributeIds = productAttributes.map((prodAtt) => prodAtt._id)
+    while (retryCount < MAX_RETRIES) {
+      const session = await this.productModel.db.startSession()
 
-      // Delete all related records
-      await Promise.all([
-        this.productModel.deleteOne({ _id }).session(session),
-        this.productAttributeModel.deleteMany({ product: _id }).session(session),
-        this.productAttributeSkuModel.deleteMany({ productAttribute: { $in: productAttributeIds } }).session(session),
-        this.skuModel.deleteMany({ product: _id }).session(session)
-      ])
+      try {
+        session.startTransaction({
+          readConcern: { level: 'snapshot' },
+          writeConcern: { w: 'majority' },
+          maxCommitTimeMS: 10000
+        })
 
-      await session.commitTransaction()
-      return { deleted: true }
-    } catch (error) {
-      await session.abortTransaction()
-      throw error
-    } finally {
-      session.endSession()
-    }
-  }
+        // Find related records to delete
+        const productAttributes = await this.productAttributeModel.find({ product: _id })
+        const productAttributeIds = productAttributes.map((prodAtt) => prodAtt._id)
 
-  async bulkRemove(ids: string[]) {
-    const session = await this.productModel.db.startSession()
-    try {
-      session.startTransaction()
+        // Delete all related records
+        await Promise.all([
+          this.productModel.deleteOne({ _id }).session(session),
+          this.productAttributeModel.deleteMany({ product: _id }).session(session),
+          this.productAttributeSkuModel.deleteMany({ productAttribute: { $in: productAttributeIds } }).session(session),
+          this.skuModel.deleteMany({ product: _id }).session(session)
+        ])
 
-      const productAttributes = await this.productAttributeModel.find({ product: { $in: ids } })
-      const productAttributeIds = productAttributes.map((prodAtt) => prodAtt._id)
+        await session.commitTransaction()
+        session.endSession()
+        return { deleted: true }
+      } catch (error) {
+        await session.abortTransaction()
+        session.endSession()
 
-      await Promise.all([
-        this.productModel.deleteMany({ _id: { $in: ids } }).session(session),
-        this.productAttributeModel.deleteMany({ product: { $in: ids } }).session(session),
-        this.productAttributeSkuModel.deleteMany({ productAttribute: { $in: productAttributeIds } }).session(session),
-        this.skuModel.deleteMany({ product: { $in: ids } }).session(session)
-      ])
+        // Check if it's a transient transaction error that we should retry
+        if (
+          (error as any).errorLabels &&
+          (error as any).errorLabels.includes('TransientTransactionError') &&
+          retryCount < MAX_RETRIES - 1
+        ) {
+          retryCount++
+          console.log(`Transaction failed with transient error, retrying (${retryCount}/${MAX_RETRIES})...`)
+          await new Promise((resolve) => setTimeout(resolve, 100 * Math.pow(2, retryCount)))
+          continue
+        }
 
-      await session.commitTransaction()
-      return { deleted: true }
-    } catch (error) {
-      await session.abortTransaction()
-      throw error
-    } finally {
-      session.endSession()
+        throw error
+      }
     }
   }
 

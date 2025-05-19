@@ -88,7 +88,23 @@ let AccountsService = exports.AccountsService = class AccountsService {
         };
     }
     async findAll(qs) {
-        const { page, limit, sort: sortQuery, ...filter } = qs;
+        const { page, limit, sort: sortQuery, email, fullName, isActive, role } = qs;
+        const filter = {};
+        if (email) {
+            filter.email = email;
+        }
+        if (fullName) {
+            filter.fullName = { $regex: fullName, $options: 'i' };
+        }
+        if (isActive) {
+            filter.isActive = true;
+        }
+        else if (isActive === 0) {
+            filter.isActive = false;
+        }
+        if (role) {
+            filter.role = role;
+        }
         let sort = { createdAt: -1 };
         if (sortQuery) {
             const sortField = sortQuery.split('.')[0];
