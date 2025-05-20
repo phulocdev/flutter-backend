@@ -83,7 +83,7 @@ let AuthService = exports.AuthService = class AuthService {
         }
         const [accessToken, refreshToken] = await Promise.all([
             this.signAccessToken({
-                _id: accountId,
+                _id: account._id,
                 email,
                 fullName,
                 role: enum_1.Role.Customer,
@@ -92,7 +92,7 @@ let AuthService = exports.AuthService = class AuthService {
                 phoneNumber: account.phoneNumber
             }),
             this.signRefreshToken({
-                _id: accountId,
+                _id: account._id,
                 email,
                 fullName,
                 role: enum_1.Role.Customer,
@@ -101,7 +101,7 @@ let AuthService = exports.AuthService = class AuthService {
                 phoneNumber: account.phoneNumber
             })
         ]);
-        this.accountsService.updateRefreshToken(accountId, refreshToken);
+        this.accountsService.updateRefreshToken(account._id.toString(), refreshToken);
         return {
             accessToken,
             refreshToken,
