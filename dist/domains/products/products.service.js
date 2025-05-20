@@ -121,10 +121,13 @@ let ProductsService = exports.ProductsService = class ProductsService {
         }
     }
     async findAll(qs) {
-        const { page, limit, from, to, sort: sortQuery, name, brandIds, categoryIds, code, hasDiscount, maxPrice, minPrice, status } = qs;
+        const { page, limit, minRating, from, to, sort: sortQuery, name, brandIds, categoryIds, code, hasDiscount, maxPrice, minPrice, status } = qs;
         const filter = {};
         if (status !== undefined) {
             filter.status = status;
+        }
+        if (minRating !== undefined) {
+            filter.star = { $gte: minRating };
         }
         if (name) {
             filter.name = { $regex: name, $options: 'i' };
@@ -590,6 +593,9 @@ let ProductsService = exports.ProductsService = class ProductsService {
                 }
             }
         ]);
+    }
+    countDocs() {
+        return this.productModel.countDocuments();
     }
 };
 exports.ProductsService = ProductsService = __decorate([

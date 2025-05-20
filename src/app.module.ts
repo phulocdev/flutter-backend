@@ -16,6 +16,7 @@ import { ProductsModule } from './domains/products/products.module'
 import { OtpsModule } from 'domains/otps/otps.module'
 import { CommentsModule } from './domains/comments/comments.module'
 import { CouponsModule } from './domains/coupons/coupons.module';
+import { DashboardModule } from './domains/dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -32,7 +33,8 @@ import { CouponsModule } from './domains/coupons/coupons.module';
     CartModule,
     MailModule,
     CommentsModule,
-    CouponsModule
+    CouponsModule,
+    DashboardModule
   ],
   controllers: [AppController],
   providers: [AppService]

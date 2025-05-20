@@ -77,6 +77,7 @@ export declare class ProductsController {
         }>;
         status: import("../../core/constants/enum").ProductStatus;
         soldQuantity: number;
+        star: number;
         discountPercentage: number;
         basePrice: number;
         minStockLevel: number;
@@ -106,6 +107,7 @@ export declare class ProductsController {
         }>;
         status: import("../../core/constants/enum").ProductStatus;
         soldQuantity: number;
+        star: number;
         discountPercentage: number;
         basePrice: number;
         minStockLevel: number;

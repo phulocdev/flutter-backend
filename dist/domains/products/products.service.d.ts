@@ -60,6 +60,7 @@ export declare class ProductsService {
         }>;
         status: import("core/constants/enum").ProductStatus;
         soldQuantity: number;
+        star: number;
         discountPercentage: number;
         basePrice: number;
         minStockLevel: number;
@@ -89,6 +90,7 @@ export declare class ProductsService {
         }>;
         status: import("core/constants/enum").ProductStatus;
         soldQuantity: number;
+        star: number;
         discountPercentage: number;
         basePrice: number;
         minStockLevel: number;
@@ -116,4 +118,9 @@ export declare class ProductsService {
         __v: number;
     }>;
     findAllSkus(skuIds: string[]): Promise<any[]>;
+    countDocs(): mongoose.Query<number, mongoose.Document<unknown, {}, Product> & Product & Required<{
+        _id: Types.ObjectId;
+    }> & {
+        __v: number;
+    }, {}, Product, "countDocuments", {}>;
 }

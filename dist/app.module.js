@@ -24,6 +24,7 @@ const products_module_1 = require("./domains/products/products.module");
 const otps_module_1 = require("./domains/otps/otps.module");
 const comments_module_1 = require("./domains/comments/comments.module");
 const coupons_module_1 = require("./domains/coupons/coupons.module");
+const dashboard_module_1 = require("./domains/dashboard/dashboard.module");
 let AppModule = exports.AppModule = class AppModule {
 };
 exports.AppModule = AppModule = __decorate([
@@ -42,7 +43,8 @@ exports.AppModule = AppModule = __decorate([
             cart_module_1.CartModule,
             mail_module_1.MailModule,
             comments_module_1.CommentsModule,
-            coupons_module_1.CouponsModule
+            coupons_module_1.CouponsModule,
+            dashboard_module_1.DashboardModule
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService]

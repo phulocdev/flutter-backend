@@ -81,6 +81,41 @@ export class OrdersService {
     }
   }
 
+  countDocs() {
+    return this.orderModel.countDocuments()
+  }
+
+  async countDocsToday() {
+    const startOfDay = new Date()
+    startOfDay.setHours(0, 0, 0, 0)
+
+    const endOfDay = new Date()
+    endOfDay.setHours(23, 59, 59, 999)
+
+    return this.orderModel.countDocuments({
+      createdAt: { $gte: startOfDay, $lt: endOfDay }
+    })
+  }
+  async calculateInvest(from?: Date, to?: Date) {
+    if (!from || !to) return 0
+
+    const result = await this.orderModel.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: from, $lt: to }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: '$totalPrice' }
+        }
+      }
+    ])
+
+    return result[0]?.total || 0
+  }
+
   async findAll(qs: PaginationQueryDto & DateRangeQueryDto & OrderQueryDto) {
     const {
       page,

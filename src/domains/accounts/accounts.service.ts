@@ -226,4 +226,8 @@ export class AccountsService {
   comparePassword(password: string, hashedPassword: string) {
     return bcrypt.compare(password, hashedPassword)
   }
+
+  countDocs() {
+    return this.accountModel.countDocuments()
+  }
 }

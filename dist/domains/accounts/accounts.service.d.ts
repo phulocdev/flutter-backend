@@ -116,4 +116,19 @@ export declare class AccountsService {
     remove(id: string): Promise<mongoose.mongo.DeleteResult>;
     hashPassword(password: string): Promise<string>;
     comparePassword(password: string, hashedPassword: string): Promise<boolean>;
+    countDocs(): mongoose.Query<number, mongoose.Document<unknown, {}, mongoose.Document<unknown, {}, Account> & Account & {
+        _id: mongoose.Types.ObjectId;
+    } & {
+        __v: number;
+    }> & mongoose.Document<unknown, {}, Account> & Account & {
+        _id: mongoose.Types.ObjectId;
+    } & {
+        __v: number;
+    } & Required<{
+        _id: mongoose.Types.ObjectId;
+    }>, {}, mongoose.Document<unknown, {}, Account> & Account & {
+        _id: mongoose.Types.ObjectId;
+    } & {
+        __v: number;
+    }, "countDocuments", {}>;
 }

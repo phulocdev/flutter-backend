@@ -127,6 +127,7 @@ export class ProductsService {
     const {
       page,
       limit,
+      minRating,
       from,
       to,
       sort: sortQuery,
@@ -152,6 +153,10 @@ export class ProductsService {
 
     if (status !== undefined) {
       filter.status = status
+    }
+
+    if (minRating !== undefined) {
+      filter.star = { $gte: minRating }
     }
 
     if (name) {
@@ -711,5 +716,9 @@ export class ProductsService {
         }
       }
     ])
+  }
+
+  countDocs() {
+    return this.productModel.countDocuments()
   }
 }

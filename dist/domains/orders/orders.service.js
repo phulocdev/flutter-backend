@@ -94,6 +94,36 @@ let OrdersService = exports.OrdersService = class OrdersService {
             session.endSession();
         }
     }
+    countDocs() {
+        return this.orderModel.countDocuments();
+    }
+    async countDocsToday() {
+        const startOfDay = new Date();
+        startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date();
+        endOfDay.setHours(23, 59, 59, 999);
+        return this.orderModel.countDocuments({
+            createdAt: { $gte: startOfDay, $lt: endOfDay }
+        });
+    }
+    async calculateInvest(from, to) {
+        if (!from || !to)
+            return 0;
+        const result = await this.orderModel.aggregate([
+            {
+                $match: {
+                    createdAt: { $gte: from, $lt: to }
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    total: { $sum: '$totalPrice' }
+                }
+            }
+        ]);
+        return result[0]?.total || 0;
+    }
     async findAll(qs) {
         const { page, limit, from, to, sort: sortQuery, code, userId, status, paymentMethod, minTotalPrice, maxTotalPrice, minItemCount, maxItemCount, paymentFromDate, paymentToDate, deliveredFromDate, deliveredToDate } = qs;
         const filter = {};

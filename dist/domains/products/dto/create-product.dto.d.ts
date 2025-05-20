@@ -8,6 +8,7 @@ export declare class CreateProductDto {
     discountPercentage: number;
     imageUrl?: string;
     minStockLevel: number;
+    star: number;
     maxStockLevel: number;
     attributeNames?: string[];
     skus: SkuDto[];

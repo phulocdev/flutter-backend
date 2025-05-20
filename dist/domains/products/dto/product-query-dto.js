@@ -81,6 +81,13 @@ __decorate([
 ], ProductQueryDto.prototype, "minPrice", void 0);
 __decorate([
     (0, class_transformer_1.Type)(() => Number),
+    (0, class_validator_1.IsNumber)({}, { message: 'minRating phải là số' }),
+    (0, class_validator_1.Min)(0, { message: 'minRating phải >= 0' }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Number)
+], ProductQueryDto.prototype, "minRating", void 0);
+__decorate([
+    (0, class_transformer_1.Type)(() => Number),
     (0, class_validator_1.IsNumber)({}, { message: 'maxPrice phải là số' }),
     (0, class_validator_1.Min)(0, { message: 'maxPrice phải >= 0' }),
     (0, class_validator_1.IsOptional)(),

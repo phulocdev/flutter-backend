@@ -207,6 +207,9 @@ let AccountsService = exports.AccountsService = class AccountsService {
     comparePassword(password, hashedPassword) {
         return bcrypt.compare(password, hashedPassword);
     }
+    countDocs() {
+        return this.accountModel.countDocuments();
+    }
 };
 exports.AccountsService = AccountsService = __decorate([
     (0, common_1.Injectable)(),

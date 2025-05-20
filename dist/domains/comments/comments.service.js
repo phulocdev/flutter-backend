@@ -18,15 +18,21 @@ const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const comment_schema_1 = require("./schemas/comment.schema");
 const errors_exception_1 = require("../../core/exceptions/errors.exception");
+const products_service_1 = require("../products/products.service");
 let CommentsService = exports.CommentsService = class CommentsService {
-    constructor(commentModel) {
+    constructor(commentModel, productsService) {
         this.commentModel = commentModel;
+        this.productsService = productsService;
     }
     async create(createCommentDto) {
-        const { stars, accountId } = createCommentDto;
+        const { stars, accountId, productId } = createCommentDto;
         if (stars && !accountId) {
             throw new errors_exception_1.BadRequestError('Khánh hàng phải đăng nhập thì mới có thể đánh giá');
         }
+        const totalCommentWithStarCounts = (await this.commentModel.find({ productId })).filter((comment) => !!comment.stars).length;
+        const currentRating = (await this.productsService.findOne(productId)).star;
+        const updatedRating = (stars + currentRating) / (1 + totalCommentWithStarCounts);
+        await this.productsService.update(productId, { star: updatedRating });
         const newComment = new this.commentModel(createCommentDto);
         return newComment.save();
     }
@@ -40,6 +46,7 @@ let CommentsService = exports.CommentsService = class CommentsService {
 exports.CommentsService = CommentsService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(comment_schema_1.Comment.name)),
-    __metadata("design:paramtypes", [mongoose_2.Model])
+    __metadata("design:paramtypes", [mongoose_2.Model,
+        products_service_1.ProductsService])
 ], CommentsService);
 //# sourceMappingURL=comments.service.js.map

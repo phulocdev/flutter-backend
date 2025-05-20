@@ -6,20 +6,20 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CommentsModule = void 0;
+exports.DashboardModule = void 0;
 const common_1 = require("@nestjs/common");
-const mongoose_1 = require("@nestjs/mongoose");
-const comment_schema_1 = require("./schemas/comment.schema");
 const products_module_1 = require("../products/products.module");
-const comments_controller_1 = require("./comments.controller");
-const comments_service_1 = require("./comments.service");
-let CommentsModule = exports.CommentsModule = class CommentsModule {
+const dashboard_controller_1 = require("./dashboard.controller");
+const dashboard_service_1 = require("./dashboard.service");
+const orders_module_1 = require("../orders/orders.module");
+const accounts_module_1 = require("../accounts/accounts.module");
+let DashboardModule = exports.DashboardModule = class DashboardModule {
 };
-exports.CommentsModule = CommentsModule = __decorate([
+exports.DashboardModule = DashboardModule = __decorate([
     (0, common_1.Module)({
-        imports: [mongoose_1.MongooseModule.forFeature([{ name: comment_schema_1.Comment.name, schema: comment_schema_1.CommentSchema }]), products_module_1.ProductsModule],
-        controllers: [comments_controller_1.CommentsController],
-        providers: [comments_service_1.CommentsService]
+        imports: [products_module_1.ProductsModule, orders_module_1.OrdersModule, accounts_module_1.AccountsModule],
+        controllers: [dashboard_controller_1.DashboardController],
+        providers: [dashboard_service_1.DashboardService]
     })
-], CommentsModule);
-//# sourceMappingURL=comments.module.js.map
+], DashboardModule);
+//# sourceMappingURL=dashboard.module.js.map

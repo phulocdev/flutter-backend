@@ -72,6 +72,12 @@ export class CreateProductDto {
   @IsNotEmpty({ message: 'minStockLevel không được bỏ trống' })
   minStockLevel: number
 
+  @Min(0, { message: 'star phải ≥ 0' })
+  @IsInt({ message: 'star phải là số nguyên' })
+  @Transform(({ value }) => Number(value))
+  @IsNotEmpty({ message: 'star không được bỏ trống' })
+  star: number
+
   @Min(1, { message: 'maxStockLevel phải >= 1' })
   @IsInt({ message: 'maxStockLevel phải là số nguyên' })
   @Transform(({ value }) => Number(value))

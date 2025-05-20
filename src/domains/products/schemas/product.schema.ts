@@ -36,6 +36,9 @@ export class Product {
   soldQuantity: number
 
   @Prop({ required: false, type: Number, default: 0 })
+  star: number
+
+  @Prop({ required: false, type: Number, default: 0 })
   discountPercentage: number
 
   @Prop({ required: true, type: Number })

@@ -8,5 +8,6 @@ export declare class ProductQueryDto {
     hasDiscount: number;
     status?: ProductStatus;
     minPrice?: number;
+    minRating?: number;
     maxPrice?: number;
 }

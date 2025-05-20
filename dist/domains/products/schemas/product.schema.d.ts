@@ -13,6 +13,7 @@ export declare class Product {
     brand: Brand;
     status: ProductStatus;
     soldQuantity: number;
+    star: number;
     discountPercentage: number;
     basePrice: number;
     minStockLevel: number;

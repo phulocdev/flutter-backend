@@ -74,6 +74,12 @@ export class ProductQueryDto {
   minPrice?: number
 
   @Type(() => Number)
+  @IsNumber({}, { message: 'minRating phải là số' })
+  @Min(0, { message: 'minRating phải >= 0' })
+  @IsOptional()
+  minRating?: number
+
+  @Type(() => Number)
   @IsNumber({}, { message: 'maxPrice phải là số' })
   @Min(0, { message: 'maxPrice phải >= 0' })
   @IsOptional()

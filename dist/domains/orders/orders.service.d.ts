@@ -20,6 +20,13 @@ export declare class OrdersService {
     }> & {
         __v: number;
     }>;
+    countDocs(): mongoose.Query<number, mongoose.Document<unknown, {}, Order> & Order & Required<{
+        _id: Types.ObjectId;
+    }> & {
+        __v: number;
+    }, {}, Order, "countDocuments", {}>;
+    countDocsToday(): Promise<number>;
+    calculateInvest(from?: Date, to?: Date): Promise<any>;
     findAll(qs: PaginationQueryDto & DateRangeQueryDto & OrderQueryDto): Promise<{
         data: (mongoose.Document<unknown, {}, Order> & Order & Required<{
             _id: Types.ObjectId;

@@ -71,6 +71,13 @@ __decorate([
     __metadata("design:type", Number)
 ], CreateProductDto.prototype, "minStockLevel", void 0);
 __decorate([
+    (0, class_validator_1.Min)(0, { message: 'star phải ≥ 0' }),
+    (0, class_validator_1.IsInt)({ message: 'star phải là số nguyên' }),
+    (0, class_transformer_1.Transform)(({ value }) => Number(value)),
+    (0, class_validator_1.IsNotEmpty)({ message: 'star không được bỏ trống' }),
+    __metadata("design:type", Number)
+], CreateProductDto.prototype, "star", void 0);
+__decorate([
     (0, class_validator_1.Min)(1, { message: 'maxStockLevel phải >= 1' }),
     (0, class_validator_1.IsInt)({ message: 'maxStockLevel phải là số nguyên' }),
     (0, class_transformer_1.Transform)(({ value }) => Number(value)),
