@@ -31,7 +31,7 @@ let CommentsService = exports.CommentsService = class CommentsService {
         }
         const totalCommentWithStarCounts = (await this.commentModel.find({ productId })).filter((comment) => !!comment.stars).length;
         const currentRating = (await this.productsService.findOne(productId)).star;
-        const updatedRating = (stars + currentRating) / (1 + totalCommentWithStarCounts);
+        const updatedRating = (stars ?? 0 + currentRating) / (1 + totalCommentWithStarCounts);
         await this.productsService.update(productId, { star: updatedRating });
         const newComment = new this.commentModel(createCommentDto);
         return newComment.save();
